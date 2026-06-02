@@ -12,6 +12,25 @@ const RegistrationPage = (() => {
     const container = App.getPageContent();
     if (!container) return;
 
+    const currentUser = Store.getCurrentUser();
+    if (currentUser && currentUser.role === 'peserta') {
+      const allRegistrations = Store.getAllRegistrations();
+      const isAlreadyRegistered = allRegistrations.some(r => r.eventId === eventId && r.userId === currentUser.id);
+      if (isAlreadyRegistered) {
+        container.innerHTML = `
+          <div class="empty-state animate-fade-in" style="min-height: 60vh;">
+            <span class="material-symbols-outlined text-teal" style="font-size: 56px; color: var(--teal-accent);">check_circle</span>
+            <h3 style="font-family: var(--font-heading); font-size: 20px; font-weight: 700; color: var(--primary);">Anda Sudah Terdaftar</h3>
+            <p style="color: var(--outline); font-size: 14px;">Anda sudah terdaftar untuk event ini. Mengarahkan Anda ke portal peserta...</p>
+          </div>
+        `;
+        setTimeout(() => {
+          window.location.hash = '#list-seminar';
+        }, 1500);
+        return;
+      }
+    }
+
     if (!eventId) {
       container.innerHTML = `
         <div class="empty-state animate-fade-in" style="min-height: 60vh;">
@@ -350,6 +369,15 @@ const RegistrationPage = (() => {
         });
 
         if (!regRes.success) {
+          if (regRes.error && regRes.error.includes('sudah terdaftar')) {
+            App.showToast('Anda sudah terdaftar untuk event ini! Mengarahkan ke portal...', 'info');
+            await Store.login(participantPhone, '123456');
+            setTimeout(() => {
+              window.location.hash = '#list-seminar';
+              window.location.reload();
+            }, 1500);
+            return;
+          }
           App.showToast(regRes.error || 'Anda sudah terdaftar untuk event ini!', 'error');
           if (btnSubmit) {
             btnSubmit.disabled = false;
@@ -359,7 +387,7 @@ const RegistrationPage = (() => {
         }
 
         // 3. Render Success View
-        renderSuccessScreen(participantName, participantPhone);
+        await renderSuccessScreen(participantName, participantPhone);
       } catch (err) {
         console.error("Registration error:", err);
         App.showToast('Terjadi kesalahan saat memproses pendaftaran.', 'error');
@@ -372,12 +400,12 @@ const RegistrationPage = (() => {
   }
 
   // ============ Render Beautiful Success Screen ============
-  function renderSuccessScreen(name, phone) {
+  async function renderSuccessScreen(name, phone) {
     const container = App.getPageContent();
     if (!container) return;
 
     // Auto-login registered participant
-    Store.login(phone, '123456');
+    await Store.login(phone, '123456');
 
     container.innerHTML = `
       <div class="participant-container animate-fade-in" style="max-width: 600px; margin: var(--space-12) auto; padding: 0 var(--space-4);">
