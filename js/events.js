@@ -394,6 +394,20 @@ const EventsPage = (() => {
             <input type="date" class="form-input" id="evDate" value="${event ? event.date : today}" required>
           </div>
           <div class="form-group">
+            <label class="form-label" for="evCategory">Kategori Event</label>
+            <select class="form-select" id="evCategory">
+              <option value="Seminar" ${event && event.category === 'Seminar' ? 'selected' : ''}>Seminar</option>
+              <option value="Webinar" ${event && event.category === 'Webinar' ? 'selected' : ''}>Webinar</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label" for="evLocation">Tempat / Lokasi <span class="required">*</span></label>
+            <input type="text" class="form-input" id="evLocation" value="${event ? escapeHtml(event.location) : ''}" placeholder="Contoh: Gedung Aula JCC, Lantai 2 / Online (Zoom)" required>
+          </div>
+          <div class="form-group">
             <label class="form-label" for="evStatus">Status Event</label>
             <select class="form-select" id="evStatus">
               <option value="active" ${event && event.status === 'active' ? 'selected' : ''}>Aktif</option>
@@ -404,8 +418,8 @@ const EventsPage = (() => {
         </div>
 
         <div class="form-group">
-          <label class="form-label" for="evLocation">Tempat / Lokasi <span class="required">*</span></label>
-          <input type="text" class="form-input" id="evLocation" value="${event ? escapeHtml(event.location) : ''}" placeholder="Contoh: Gedung Aula JCC, Lantai 2 / Online (Zoom)" required>
+          <label class="form-label" for="evSponsors">Daftar Sponsor (Pisahkan dengan koma)</label>
+          <input type="text" class="form-input" id="evSponsors" value="${event && event.sponsors ? escapeHtml(event.sponsors.join(', ')) : 'Anakku.id, InsForge'}" placeholder="Contoh: Anakku.id, InsForge, Google DeepMind">
         </div>
       </form>
     `;
@@ -428,15 +442,18 @@ const EventsPage = (() => {
           const title = document.getElementById('evTitle').value.trim();
           const description = document.getElementById('evDescription').value.trim();
           const date = document.getElementById('evDate').value;
+          const category = document.getElementById('evCategory').value;
           const status = document.getElementById('evStatus').value;
           const location = document.getElementById('evLocation').value.trim();
+          const sponsorsVal = document.getElementById('evSponsors').value.trim();
+          const sponsors = sponsorsVal ? sponsorsVal.split(',').map(s => s.trim()).filter(Boolean) : [];
 
           if (!title || !date || !location) {
             App.showToast('Mohon lengkapi semua kolom wajib!', 'error');
             return;
           }
 
-          const eventData = { title, description, date, status, location };
+          const eventData = { title, description, date, status, location, category, sponsors };
 
           (async () => {
             if (isEdit) {

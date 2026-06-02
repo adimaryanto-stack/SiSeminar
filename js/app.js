@@ -14,6 +14,7 @@ const App = (() => {
     'chat': { label: 'Chat Grup', icon: 'forum', render: () => ChatPage.render() },
     'attendance': { label: 'Presensi', icon: 'qr_code_scanner', render: () => AttendancePage.render() },
     'feedback-results': { label: 'Hasil Feedback', icon: 'reviews', render: () => QuestionnairePage.renderResults(App.getRouteParams().params.event) },
+    'sponsors-history': { label: 'Sponsor & Riwayat', icon: 'stars', render: () => SponsorsHistoryPage.render() },
   };
 
   const publicRoutes = ['login', 'register', 'checkin'];
@@ -111,6 +112,8 @@ const App = (() => {
         renderPesertaLayout(() => ListSeminarPage.render());
       } else if (route === 'feedback') {
         renderPesertaLayout(() => QuestionnairePage.renderForm(params.event));
+      } else if (route === 'sponsors-history') {
+        renderPesertaLayout(() => SponsorsHistoryPage.render());
       } else {
         navigate('chat');
       }
@@ -279,6 +282,10 @@ const App = (() => {
           <button class="sidebar-nav-item ${activeRoute === 'checkin-peserta' ? 'active' : ''}" onclick="App.navigate('checkin-peserta')">
             <span class="material-symbols-outlined">qr_code_scanner</span>
             Check-in
+          </button>
+          <button class="sidebar-nav-item ${activeRoute === 'sponsors-history' ? 'active' : ''}" onclick="App.navigate('sponsors-history')">
+            <span class="material-symbols-outlined">stars</span>
+            Sponsor & Riwayat
           </button>
         </nav>
         <div class="sidebar-user">

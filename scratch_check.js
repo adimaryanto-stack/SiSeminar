@@ -12,6 +12,7 @@ const files = [
   'js/attendance.js',
   'js/list-seminar.js',
   'js/questionnaire.js',
+  'js/sponsors-history.js',
   'js/app.js'
 ];
 

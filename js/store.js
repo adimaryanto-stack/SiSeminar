@@ -115,7 +115,24 @@ const Store = (() => {
 
       // 2. Events
       const { data: events } = await sdk.database.from('events').select('*');
-      if (events) set(KEYS.events, events);
+      if (events) {
+        set(KEYS.events, events.map(e => ({
+          id: e.id,
+          title: e.title,
+          description: e.description || '',
+          date: e.date,
+          endDate: e.end_date,
+          location: e.location || '',
+          coverImage: e.cover_image || '',
+          status: e.status || 'draft',
+          joinCode: e.join_code,
+          adminId: e.admin_id,
+          participantCount: e.participant_count || 0,
+          createdAt: e.created_at,
+          category: e.category || 'Seminar',
+          sponsors: e.sponsors || ['Anakku.id', 'InsForge']
+        })));
+      }
 
       // 3. Form Fields
       const { data: formFields } = await sdk.database.from('form_fields').select('*');
@@ -513,7 +530,9 @@ const Store = (() => {
       joinCode: generateJoinCode(),
       adminId: getCurrentUser()?.id || 'admin_001',
       participantCount: 0,
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      category: eventData.category || 'Seminar',
+      sponsors: eventData.sponsors || ['Anakku.id', 'InsForge']
     };
     events.push(event);
     set(KEYS.events, events);
@@ -534,7 +553,9 @@ const Store = (() => {
           join_code: event.joinCode,
           admin_id: event.adminId,
           participant_count: event.participantCount,
-          created_at: event.createdAt
+          created_at: event.createdAt,
+          category: event.category,
+          sponsors: event.sponsors
         }]);
       } catch (err) {
         console.warn("[InsForge] Gagal menyelaraskan event baru:", err);
@@ -594,7 +615,9 @@ const Store = (() => {
           location: data.location,
           cover_image: data.coverImage || '',
           status: data.status,
-          participant_count: data.participantCount ?? events[idx].participantCount
+          participant_count: data.participantCount ?? events[idx].participantCount,
+          category: data.category || events[idx].category,
+          sponsors: data.sponsors || events[idx].sponsors
         }).eq('id', id);
       } catch (err) {
         console.warn("[InsForge] Gagal menyelaraskan update event:", err);
