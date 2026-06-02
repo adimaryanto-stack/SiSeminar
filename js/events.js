@@ -196,6 +196,12 @@ const EventsPage = (() => {
             <button class="btn-broadcast-event topbar-icon-btn" data-id="${event.id}" data-title="${escapeHtml(event.title)}" title="Kirim Broadcast ke Grup Chat" style="padding: 2px; color: var(--primary);">
               <span class="material-symbols-outlined" style="font-size: 20px;">campaign</span>
             </button>
+            <button class="btn-q-builder topbar-icon-btn" data-id="${event.id}" title="Builder Kuesioner" style="padding: 2px; color: var(--teal-accent);">
+              <span class="material-symbols-outlined" style="font-size: 20px;">settings_suggest</span>
+            </button>
+            <button class="btn-q-results topbar-icon-btn" data-id="${event.id}" title="Hasil Evaluasi Kuesioner" style="padding: 2px; color: var(--primary);">
+              <span class="material-symbols-outlined" style="font-size: 20px;">insights</span>
+            </button>
             <button class="btn-delete-event topbar-icon-btn" data-id="${event.id}" data-title="${escapeHtml(event.title)}" title="Hapus Event" style="padding: 2px; color: var(--destructive-red);">
               <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
             </button>
@@ -267,6 +273,22 @@ const EventsPage = (() => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         openBroadcastModal(btn.dataset.id, btn.dataset.title);
+      });
+    });
+
+    // Questionnaire Builder Button
+    document.querySelectorAll('.btn-q-builder').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.hash = `#questionnaire-builder?event=${btn.dataset.id}`;
+      });
+    });
+
+    // Questionnaire Results Button
+    document.querySelectorAll('.btn-q-results').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        window.location.hash = `#feedback-results?event=${btn.dataset.id}`;
       });
     });
 

@@ -108,6 +108,8 @@ const App = (() => {
         renderPesertaLayout(() => AttendancePage.renderPesertaCheckin());
       } else if (route === 'list-seminar') {
         renderPesertaLayout(() => ListSeminarPage.render());
+      } else if (route === 'feedback') {
+        renderPesertaLayout(() => QuestionnairePage.renderForm(params.event));
       } else {
         navigate('chat');
       }
@@ -118,6 +120,12 @@ const App = (() => {
     if (adminRoutes[route]) {
       currentRoute = route;
       renderAdminLayout(route, params);
+    } else if (route === 'questionnaire-builder') {
+      currentRoute = route;
+      renderAdminLayoutCustom(() => QuestionnairePage.renderBuilder(params.event));
+    } else if (route === 'feedback-results') {
+      currentRoute = route;
+      renderAdminLayoutCustom(() => QuestionnairePage.renderResults(params.event));
     } else {
       navigate('events');
     }
@@ -156,6 +164,27 @@ const App = (() => {
     if (adminRoutes[route]) {
       adminRoutes[route].render();
     }
+  }
+
+  function renderAdminLayoutCustom(renderFn) {
+    const app = document.getElementById('app');
+    app.className = 'app-layout';
+    
+    app.innerHTML = `
+      ${renderSidebar('')}
+      <div class="sidebar-overlay" id="sidebarOverlay"></div>
+      <div class="main-content">
+        ${renderTopbar()}
+        <div class="page-content" id="pageContent"></div>
+        ${renderFooter()}
+      </div>
+    `;
+
+    // Sidebar events
+    setupSidebarEvents();
+
+    // Render page content
+    renderFn();
   }
 
   function renderPesertaLayout(renderFn) {

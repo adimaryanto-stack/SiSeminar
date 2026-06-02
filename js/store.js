@@ -13,6 +13,8 @@ const Store = (() => {
     chatMembers: 'siseminar_chat_members',
     messages: 'siseminar_messages',
     attendance: 'siseminar_attendance',
+    questionnaires: 'siseminar_questionnaires',
+    feedbackResponses: 'siseminar_feedback_responses',
     currentUser: 'siseminar_current_user',
     initialized: 'siseminar_initialized'
   };
@@ -198,6 +200,32 @@ const Store = (() => {
           method: a.method,
           qrToken: a.qr_token,
           checkedInAt: a.checked_in_at
+        })));
+      }
+
+      // 9. Questionnaires
+      const { data: qns } = await sdk.database.from('questionnaires').select('*');
+      if (qns) {
+        set(KEYS.questionnaires, qns.map(q => ({
+          id: q.id,
+          eventId: q.event_id,
+          title: q.title,
+          description: q.description || '',
+          questions: q.questions || [],
+          createdAt: q.created_at
+        })));
+      }
+
+      // 10. Feedback Responses
+      const { data: fbrs } = await sdk.database.from('feedback_responses').select('*');
+      if (fbrs) {
+        set(KEYS.feedbackResponses, fbrs.map(f => ({
+          id: f.id,
+          eventId: f.event_id,
+          userId: f.user_id,
+          userName: f.user_name,
+          answers: f.answers || [],
+          submittedAt: f.submitted_at
         })));
       }
 
@@ -591,6 +619,10 @@ const Store = (() => {
     set(KEYS.chatMembers, get(KEYS.chatMembers).filter(m => !groupIds.includes(m.groupId)));
     set(KEYS.messages, get(KEYS.messages).filter(m => !groupIds.includes(m.groupId)));
 
+    // 3b. Delete associated questionnaires and feedback responses locally
+    set(KEYS.questionnaires, get(KEYS.questionnaires).filter(q => q.eventId !== id));
+    set(KEYS.feedbackResponses, get(KEYS.feedbackResponses).filter(f => f.eventId !== id));
+
     // 4. Delete the event locally
     set(KEYS.events, get(KEYS.events).filter(e => e.id !== id));
 
@@ -603,6 +635,8 @@ const Store = (() => {
         await sdk.database.from('chat_groups').delete().eq('event_id', id);
         await sdk.database.from('registrations').delete().eq('event_id', id);
         await sdk.database.from('attendance').delete().eq('event_id', id);
+        await sdk.database.from('questionnaires').delete().eq('event_id', id);
+        await sdk.database.from('feedback_responses').delete().eq('event_id', id);
 
         // Finally delete the event
         await sdk.database.from('events').delete().eq('id', id);
@@ -1117,6 +1151,117 @@ const Store = (() => {
     return event.qrToken;
   }
 
+  // ============ Questionnaire & Feedback ============
+  function getQuestionnaire(eventId) {
+    const list = get(KEYS.questionnaires);
+    return list.find(q => q.eventId === eventId) || null;
+  }
+
+  async function saveQuestionnaire(eventId, data) {
+    const list = get(KEYS.questionnaires);
+    const idx = list.findIndex(q => q.eventId === eventId);
+    
+    const existingId = idx > -1 ? list[idx].id : generateId();
+    const qRecord = {
+      id: existingId,
+      eventId: eventId,
+      title: data.title || 'Evaluasi Seminar',
+      description: data.description || 'Mohon isi kuesioner ini untuk meningkatkan kualitas seminar kami.',
+      questions: data.questions || [],
+      createdAt: idx > -1 ? list[idx].createdAt : new Date().toISOString()
+    };
+
+    if (idx > -1) {
+      list[idx] = qRecord;
+    } else {
+      list.push(qRecord);
+    }
+    set(KEYS.questionnaires, list);
+
+    const sdk = await ensureSdk();
+    if (sdk) {
+      try {
+        if (idx > -1) {
+          await sdk.database.from('questionnaires').update({
+            title: qRecord.title,
+            description: qRecord.description,
+            questions: qRecord.questions
+          }).eq('id', existingId);
+        } else {
+          await sdk.database.from('questionnaires').insert([{
+            id: qRecord.id,
+            event_id: qRecord.eventId,
+            title: qRecord.title,
+            description: qRecord.description,
+            questions: qRecord.questions,
+            created_at: qRecord.createdAt
+          }]);
+        }
+      } catch (err) {
+        console.warn("[InsForge] Gagal menyimpan kuesioner ke cloud:", err);
+      }
+    }
+    return qRecord;
+  }
+
+  async function submitFeedbackResponse(feedbackData) {
+    const list = get(KEYS.feedbackResponses);
+    const normalizedUserId = feedbackData.userId || getCurrentUser()?.id;
+    
+    // Check if already submitted
+    const existing = list.find(f => f.eventId === feedbackData.eventId && f.userId === normalizedUserId);
+    if (existing) {
+      return { success: false, error: 'Anda sudah mengisi kuesioner untuk event ini!' };
+    }
+
+    const record = {
+      id: generateId(),
+      eventId: feedbackData.eventId,
+      userId: normalizedUserId,
+      userName: feedbackData.userName || getCurrentUser()?.name || 'Anonim',
+      answers: feedbackData.answers || [],
+      submittedAt: new Date().toISOString()
+    };
+
+    list.push(record);
+    set(KEYS.feedbackResponses, list);
+
+    const sdk = await ensureSdk();
+    if (sdk) {
+      try {
+        const { error } = await sdk.database.from('feedback_responses').insert([{
+          id: record.id,
+          event_id: record.eventId,
+          user_id: record.userId,
+          user_name: record.userName,
+          answers: record.answers,
+          submitted_at: record.submittedAt
+        }]);
+        if (error) {
+          console.warn("[InsForge] Gagal menyimpan respons kuesioner ke cloud:", error);
+          if (error.message && error.message.includes('unique_event_user_feedback')) {
+            return { success: false, error: 'Anda sudah mengisi kuesioner untuk event ini!' };
+          }
+        }
+      } catch (err) {
+        console.warn("[InsForge] Exception menyimpan respons kuesioner:", err);
+      }
+    }
+    return { success: true, response: record };
+  }
+
+  function getFeedbackResponses(eventId) {
+    const list = get(KEYS.feedbackResponses);
+    return list.filter(f => f.eventId === eventId);
+  }
+
+  function hasUserSubmittedFeedback(eventId, userId) {
+    const list = get(KEYS.feedbackResponses);
+    const targetUserId = userId || getCurrentUser()?.id;
+    if (!targetUserId) return false;
+    return list.some(f => f.eventId === eventId && f.userId === targetUserId);
+  }
+
   // ============ Export CSV ============
   function exportCSV(data, filename) {
     if (!data || data.length === 0) return;
@@ -1359,6 +1504,13 @@ const Store = (() => {
     getAttendance,
     addAttendance,
     getEventQRToken,
+
+    // Questionnaire & Feedback
+    getQuestionnaire,
+    saveQuestionnaire,
+    submitFeedbackResponse,
+    getFeedbackResponses,
+    hasUserSubmittedFeedback,
 
     // Export
     exportCSV,

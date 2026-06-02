@@ -170,15 +170,27 @@ const ListSeminarPage = (() => {
               </div>
 
               <!-- Actions -->
-              <div class="flex gap-2" style="border-top: 1px solid var(--border-subtle); padding-top: var(--space-3); width: 100%;">
-                <button class="btn btn-outline" onclick="App.navigate('chat')" style="flex: 1; font-size: 12px; height: 36px; padding: 0 8px; justify-content: center; gap: 4px;">
-                  <span class="material-symbols-outlined" style="font-size: 16px;">forum</span>
-                  Grup Chat
-                </button>
-                <button class="btn btn-primary" onclick="App.navigate('checkin-peserta')" style="flex: 1; font-size: 12px; height: 36px; padding: 0 8px; justify-content: center; gap: 4px;">
-                  <span class="material-symbols-outlined" style="font-size: 16px;">qr_code_scanner</span>
-                  Check-in QR
-                </button>
+              <div class="flex flex-col gap-2" style="border-top: 1px solid var(--border-subtle); padding-top: var(--space-3); width: 100%;">
+                <div class="flex gap-2">
+                  <button class="btn btn-outline" onclick="App.navigate('chat')" style="flex: 1; font-size: 12px; height: 36px; padding: 0 8px; justify-content: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">forum</span>
+                    Grup Chat
+                  </button>
+                  <button class="btn btn-primary" onclick="App.navigate('checkin-peserta')" style="flex: 1; font-size: 12px; height: 36px; padding: 0 8px; justify-content: center; gap: 4px;">
+                    <span class="material-symbols-outlined" style="font-size: 16px;">qr_code_scanner</span>
+                    Check-in QR
+                  </button>
+                </div>
+                ${Store.hasUserSubmittedFeedback(event.id, currentUser.id)
+                  ? `<button class="btn btn-secondary" disabled style="width: 100%; font-size: 12px; height: 36px; padding: 0 8px; justify-content: center; gap: 4px; opacity: 0.65; cursor: not-allowed; display: flex; align-items: center; border: 1px solid var(--border-subtle);">
+                      <span class="material-symbols-outlined" style="font-size: 16px; color: var(--teal-accent);">verified</span>
+                      Evaluasi Dikirim
+                     </button>`
+                  : `<button class="btn btn-teal" onclick="App.navigate('feedback?event=${event.id}')" style="width: 100%; font-size: 12px; height: 36px; padding: 0 8px; justify-content: center; gap: 4px; background: var(--teal-accent); color: white; border: none; border-radius: var(--radius-md); font-weight: 600; cursor: pointer; display: flex; align-items: center; transition: all 0.2s;">
+                      <span class="material-symbols-outlined" style="font-size: 16px;">rate_review</span>
+                      Isi Kuesioner Evaluasi
+                     </button>`
+                }
               </div>
             </div>
           `;

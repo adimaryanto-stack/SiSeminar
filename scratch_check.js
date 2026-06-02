@@ -10,6 +10,8 @@ const files = [
   'js/participants.js',
   'js/chat.js',
   'js/attendance.js',
+  'js/list-seminar.js',
+  'js/questionnaire.js',
   'js/app.js'
 ];
 

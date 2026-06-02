@@ -84,6 +84,12 @@ const AttendancePage = (() => {
                 <div id="qrcode" class="qr-code-wrapper" style="padding: var(--space-3); background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md);"></div>
               </div>
 
+              <!-- Kode Presensi Manual -->
+              <div style="background: var(--surface-container-low); padding: var(--space-3); border-radius: var(--radius-md); border: 1px solid var(--border-subtle); margin-bottom: var(--space-5);">
+                <span style="font-size: 11px; font-weight: 700; color: var(--outline); text-transform: uppercase; letter-spacing: 0.05em; display: block; margin-bottom: 4px;">Kode Join Presensi Manual</span>
+                <span style="font-size: 22px; font-weight: 800; color: var(--teal-accent); letter-spacing: 2px; font-family: monospace;">${escapeHtml(event.joinCode)}</span>
+              </div>
+
               <div class="flex flex-col gap-2">
                 <button class="btn btn-primary" id="btnCopyCheckinLink" style="justify-content: center;">
                   <span class="material-symbols-outlined" style="font-size: 18px;">content_copy</span>

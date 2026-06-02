@@ -218,7 +218,7 @@ const ParticipantsPage = (() => {
           
           <!-- Popup Action Dropdown -->
           ${activeMenuRegistrationId === reg.id ? `
-            <div class="action-dropdown" style="position: absolute; right: 40px; top: 10px; background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 100; min-width: 160px; display: flex; flex-direction: column; overflow: hidden; animation: scaleIn var(--transition-fast) forwards;">
+            <div class="action-dropdown" style="position: absolute; right: 40px; ${idx >= 5 ? 'bottom: 10px;' : 'top: 10px;'} background: white; border: 1px solid var(--border-subtle); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 100; min-width: 160px; display: flex; flex-direction: column; overflow: hidden; animation: scaleIn var(--transition-fast) forwards;">
               <button class="action-dropdown-item btn-view-detail" data-id="${reg.id}" style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; border: none; background: transparent; text-align: left; cursor: pointer; font-size: 13px; color: var(--on-surface);">
                 <span class="material-symbols-outlined" style="font-size: 18px; color: var(--outline);">info</span>
                 Lihat Detail
