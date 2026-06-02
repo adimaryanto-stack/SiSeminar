@@ -365,7 +365,6 @@ const Store = (() => {
               phone: user.phone,
               password: user.password,
               role: user.role,
-              email: user.email,
               created_at: user.createdAt
             }]);
           }
