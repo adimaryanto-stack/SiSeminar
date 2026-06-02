@@ -304,9 +304,26 @@ const Store = (() => {
   async function addUser(userData) {
     const users = get(KEYS.users);
     const existing = users.find(u => normalizePhone(u.phone) === normalizePhone(userData.phone));
-    if (existing) return { success: false, error: 'Nomor WhatsApp sudah terdaftar' };
+    if (existing) {
+      // If locally exists, check if we need to sync with cloud Auth
+      const sdk = await ensureSdk();
+      if (sdk && existing.id.length < 20) { // Local ID, try to get cloud ID
+        try {
+          const signInRes = await sdk.auth.signInWithPassword({
+            email: existing.email || (existing.phone + '@siseminar.com'),
+            password: existing.password || '123456'
+          });
+          if (signInRes && signInRes.data && signInRes.data.user) {
+            const authId = signInRes.data.user.id;
+            existing.id = authId;
+            set(KEYS.users, users);
+          }
+        } catch (e) {}
+      }
+      return { success: false, error: 'Nomor WhatsApp sudah terdaftar', user: existing };
+    }
     
-    const userId = userData.id || generateId();
+    let userId = userData.id || generateId();
     const user = {
       id: userId,
       name: userData.name,
@@ -324,7 +341,7 @@ const Store = (() => {
     if (sdk) {
       try {
         // Register Auth in InsForge first
-        await sdk.auth.signUp({
+        const signUpRes = await sdk.auth.signUp({
           email: user.email,
           password: user.password,
           profile: {
@@ -333,18 +350,67 @@ const Store = (() => {
           }
         });
 
-        // Insert to public users table
-        await sdk.database.from('users').insert([{
-          id: user.id,
-          name: user.name,
-          phone: user.phone,
-          password: user.password,
-          role: user.role,
-          email: user.email,
-          created_at: user.createdAt
-        }]);
+        if (signUpRes && signUpRes.data && signUpRes.data.user) {
+          const authId = signUpRes.data.user.id;
+          user.id = authId;
+          
+          // Update in local users
+          const idx = users.findIndex(u => u.phone === user.phone);
+          if (idx > -1) {
+            users[idx].id = authId;
+            set(KEYS.users, users);
+          }
+
+          // Insert to public users table
+          await sdk.database.from('users').insert([{
+            id: authId,
+            name: user.name,
+            phone: user.phone,
+            password: user.password,
+            role: user.role,
+            email: user.email,
+            created_at: user.createdAt
+          }]);
+        }
       } catch (err) {
-        console.warn("[InsForge] Gagal menyelaraskan pengguna baru:", err);
+        // Handle duplicate key (email already exists in Auth)
+        if (err.message && (err.message.includes('already exists') || err.message.includes('duplicate') || err.message.includes('unique constraint'))) {
+          try {
+            const signInRes = await sdk.auth.signInWithPassword({
+              email: user.email,
+              password: user.password
+            });
+            if (signInRes && signInRes.data && signInRes.data.user) {
+              const authId = signInRes.data.user.id;
+              user.id = authId;
+              
+              // Update in local users
+              const idx = users.findIndex(u => u.phone === user.phone);
+              if (idx > -1) {
+                users[idx].id = authId;
+                set(KEYS.users, users);
+              }
+              
+              // Also ensure they are present in the public users table in PostgreSQL
+              const { data: dbUser } = await sdk.database.from('users').select('id').eq('id', authId);
+              if (!dbUser || dbUser.length === 0) {
+                await sdk.database.from('users').insert([{
+                  id: authId,
+                  name: user.name,
+                  phone: user.phone,
+                  password: user.password,
+                  role: user.role,
+                  email: user.email,
+                  created_at: user.createdAt
+                }]);
+              }
+            }
+          } catch (signInErr) {
+            console.warn("[InsForge] Gagal sign-in fallback:", signInErr);
+          }
+        } else {
+          console.warn("[InsForge] Gagal menyelaraskan pengguna baru:", err);
+        }
       }
     }
 

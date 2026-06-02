@@ -432,7 +432,7 @@ const RegistrationPage = (() => {
               <div><strong>Username / WhatsApp:</strong> <span style="font-family: monospace; font-size: 14px; color: var(--primary); font-weight: 600;">+62 ${escapeHtml(phone.substring(2))}</span></div>
               <div><strong>Password Default:</strong> <span style="font-family: monospace; font-size: 14px; color: var(--primary); font-weight: 600;">123456</span></div>
               <p style="color: var(--outline); font-size: 11px; margin-top: 4px; line-height: 1.4;">
-                * Gunakan nomor WhatsApp dan password di atas untuk masuk kembali ke portal kapan saja. Anda telah otomatis tergabung ke grup chat WhatsApp koordinasi seminar.
+                * Gunakan nomor WhatsApp dan password di atas untuk masuk kembali ke portal kapan saja. Anda telah otomatis tergabung ke grup chat koordinasi seminar.
               </p>
             </div>
           </div>
@@ -441,7 +441,7 @@ const RegistrationPage = (() => {
           <div class="flex flex-col gap-3">
             <a href="#chat" class="btn btn-primary btn-lg" style="justify-content: center; width: 100%;">
               <span class="material-symbols-outlined" style="font-size: 20px;">forum</span>
-              Masuk ke Chat Grup WhatsApp
+              Masuk ke Chat Grup Peserta
             </a>
             <p style="font-size: 12px; color: var(--outline); margin-top: 8px;">
               Menghubungkan Anda ke chat room dalam 3 detik...
