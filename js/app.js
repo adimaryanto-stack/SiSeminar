@@ -284,8 +284,8 @@ const App = (() => {
             Check-in
           </button>
           <button class="sidebar-nav-item ${activeRoute === 'sponsors-history' ? 'active' : ''}" onclick="App.navigate('sponsors-history')">
-            <span class="material-symbols-outlined">stars</span>
-            Sponsor & Riwayat
+            <span class="material-symbols-outlined">history</span>
+            Riwayat
           </button>
         </nav>
         <div class="sidebar-user">

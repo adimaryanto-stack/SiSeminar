@@ -11,107 +11,155 @@ const SponsorsHistoryPage = (() => {
     const container = App.getPageContent();
     if (!container) return;
 
+    const currentUser = Store.getCurrentUser();
+    const isAdmin = currentUser && currentUser.role === 'admin';
+
+    // For participants, enforce tab 'past-events'
+    if (!isAdmin) {
+      activeViewTab = 'past-events';
+    }
+
     const allEvents = Store.getEvents();
     const today = new Date().toISOString().split('T')[0];
     
     // Past events filter
     const pastEvents = allEvents.filter(e => e.date < today);
 
-    // Extract all unique sponsors
+    // Extract all unique sponsors (admin only)
     const sponsorsMap = {};
+    let sponsorsList = [];
     
-    // Add some default curated premium sponsors to look WOW
-    const defaultSponsorData = {
-      'Anakku.id': { desc: 'Platform Edukasi & Pengasuhan Anak Terkemuka di Indonesia.', url: 'https://anakku.id', logoText: 'AK' },
-      'InsForge': { desc: 'All-in-One Serverless PostgreSQL & Realtime Backend Platform.', url: 'https://insforge.dev', logoText: 'IF' },
-      'Google DeepMind': { desc: 'Pionir penelitian Kecerdasan Buatan (AI) global terdepan.', url: 'https://deepmind.google', logoText: 'DM' },
-      'Telkom Indonesia': { desc: 'BUMN Telekomunikasi terbesar penyedia jaringan internet berkualitas.', url: 'https://telkom.co.id', logoText: 'TL' },
-      'Bank Mandiri': { desc: 'Mitra finansial terpercaya untuk transaksi aman & terintegrasi.', url: 'https://bankmandiri.co.id', logoText: 'BM' }
-    };
+    if (isAdmin) {
+      // Add some default curated premium sponsors to look WOW
+      const defaultSponsorData = {
+        'Anakku.id': { desc: 'Platform Edukasi & Pengasuhan Anak Terkemuka di Indonesia.', url: 'https://anakku.id', logoText: 'AK' },
+        'InsForge': { desc: 'All-in-One Serverless PostgreSQL & Realtime Backend Platform.', url: 'https://insforge.dev', logoText: 'IF' },
+        'Google DeepMind': { desc: 'Pionir penelitian Kecerdasan Buatan (AI) global terdepan.', url: 'https://deepmind.google', logoText: 'DM' },
+        'Telkom Indonesia': { desc: 'BUMN Telekomunikasi terbesar penyedia jaringan internet berkualitas.', url: 'https://telkom.co.id', logoText: 'TL' },
+        'Bank Mandiri': { desc: 'Mitra finansial terpercaya untuk transaksi aman & terintegrasi.', url: 'https://bankmandiri.co.id', logoText: 'BM' }
+      };
 
-    // Populate actual event sponsorships
-    allEvents.forEach(event => {
-      const sponsors = event.sponsors || ['Anakku.id', 'InsForge'];
-      sponsors.forEach(sp => {
-        if (!sponsorsMap[sp]) {
-          sponsorsMap[sp] = {
-            name: sp,
-            desc: defaultSponsorData[sp]?.desc || 'Mitra sponsor pendukung suksesnya rangkaian seminar parenting dan teknologi.',
-            url: defaultSponsorData[sp]?.url || '#',
-            logoText: defaultSponsorData[sp]?.logoText || sp.substring(0, 2).toUpperCase(),
-            eventsCount: 0,
-            events: []
-          };
-        }
-        sponsorsMap[sp].eventsCount++;
-        sponsorsMap[sp].events.push(event.title);
+      // Populate actual event sponsorships
+      allEvents.forEach(event => {
+        const sponsors = event.sponsors || ['Anakku.id', 'InsForge'];
+        sponsors.forEach(sp => {
+          if (!sponsorsMap[sp]) {
+            sponsorsMap[sp] = {
+              name: sp,
+              desc: defaultSponsorData[sp]?.desc || 'Mitra sponsor pendukung suksesnya rangkaian seminar parenting dan teknologi.',
+              url: defaultSponsorData[sp]?.url || '#',
+              logoText: defaultSponsorData[sp]?.logoText || sp.substring(0, 2).toUpperCase(),
+              eventsCount: 0,
+              events: []
+            };
+          }
+          sponsorsMap[sp].eventsCount++;
+          sponsorsMap[sp].events.push(event.title);
+        });
       });
-    });
+      sponsorsList = Object.values(sponsorsMap);
+    }
 
-    const sponsorsList = Object.values(sponsorsMap);
+    // Dynamic Headers based on user role
+    const pageTitle = isAdmin ? 'Sponsor & Riwayat Portofolio' : 'Riwayat Seminar & Webinar';
+    const breadcrumbLabel = isAdmin ? 'Sponsor & Riwayat' : 'Riwayat';
+
+    // Dynamic Metric Cards based on user role
+    const metricCardsHtml = isAdmin ? `
+      <!-- Metric Cards (Admin: 3 columns) -->
+      <div class="grid grid-cols-3 gap-6 mb-8" style="grid-template-columns: 1fr 1fr 1fr;">
+        <div class="card flex items-center gap-4" style="padding: var(--space-5); background: var(--surface-container-low); border-left: 4px solid var(--primary);">
+          <div style="background: rgba(30,58,138,0.1); color: var(--primary); width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 26px;">handshake</span>
+          </div>
+          <div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2;">${sponsorsList.length}</div>
+            <div style="font-size: 12px; color: var(--outline); font-weight: 600; text-transform: uppercase;">Mitra Sponsor</div>
+          </div>
+        </div>
+
+        <div class="card flex items-center gap-4" style="padding: var(--space-5); background: var(--surface-container-low); border-left: 4px solid var(--teal-accent);">
+          <div style="background: rgba(13,148,136,0.1); color: var(--teal-accent); width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 26px;">history</span>
+          </div>
+          <div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2;">${pastEvents.length}</div>
+            <div style="font-size: 12px; color: var(--outline); font-weight: 600; text-transform: uppercase;">Seminar Selesai</div>
+          </div>
+        </div>
+
+        <div class="card flex items-center gap-4" style="padding: var(--space-5); background: var(--surface-container-low); border-left: 4px solid var(--amber-accent);">
+          <div style="background: rgba(245,158,11,0.1); color: var(--amber-accent); width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 26px;">workspace_premium</span>
+          </div>
+          <div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2;">
+              ${pastEvents.filter(e => e.category === 'Webinar').length}W | ${pastEvents.filter(e => e.category !== 'Webinar').length}S
+            </div>
+            <div style="font-size: 12px; color: var(--outline); font-weight: 600; text-transform: uppercase;">Webinar & Seminar</div>
+          </div>
+        </div>
+      </div>
+    ` : `
+      <!-- Metric Cards (Peserta: 2 columns) -->
+      <div class="grid grid-cols-2 gap-6 mb-8" style="grid-template-columns: 1fr 1fr;">
+        <div class="card flex items-center gap-4" style="padding: var(--space-5); background: var(--surface-container-low); border-left: 4px solid var(--teal-accent);">
+          <div style="background: rgba(13,148,136,0.1); color: var(--teal-accent); width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 26px;">history</span>
+          </div>
+          <div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2;">${pastEvents.length}</div>
+            <div style="font-size: 12px; color: var(--outline); font-weight: 600; text-transform: uppercase;">Seminar Selesai</div>
+          </div>
+        </div>
+
+        <div class="card flex items-center gap-4" style="padding: var(--space-5); background: var(--surface-container-low); border-left: 4px solid var(--amber-accent);">
+          <div style="background: rgba(245,158,11,0.1); color: var(--amber-accent); width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
+            <span class="material-symbols-outlined" style="font-size: 26px;">workspace_premium</span>
+          </div>
+          <div>
+            <div style="font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2;">
+              ${pastEvents.filter(e => e.category === 'Webinar').length}W | ${pastEvents.filter(e => e.category !== 'Webinar').length}S
+            </div>
+            <div style="font-size: 12px; color: var(--outline); font-weight: 600; text-transform: uppercase;">Webinar & Seminar</div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    // Navigation Tabs only shown to Admin
+    const tabsHtml = isAdmin ? `
+      <!-- Navigation Tabs -->
+      <div class="tabs-container" style="border-bottom: 1px solid var(--border-subtle); display: flex; gap: var(--space-6); margin-bottom: var(--space-6); padding-left: 4px;">
+        <button class="tab-link ${activeViewTab === 'sponsors' ? 'active' : ''}" 
+                id="tabViewSponsors" 
+                style="background: none; border: none; font-family: var(--font-heading); font-size: 15px; font-weight: 600; padding: var(--space-2) 0 var(--space-3); color: ${activeViewTab === 'sponsors' ? 'var(--teal-accent)' : 'var(--outline)'}; border-bottom: 2px solid ${activeViewTab === 'sponsors' ? 'var(--teal-accent)' : 'transparent'}; cursor: pointer; transition: all 0.2s;">
+          Daftar Sponsor (${sponsorsList.length})
+        </button>
+        <button class="tab-link ${activeViewTab === 'past-events' ? 'active' : ''}" 
+                id="tabViewPastEvents" 
+                style="background: none; border: none; font-family: var(--font-heading); font-size: 15px; font-weight: 600; padding: var(--space-2) 0 var(--space-3); color: ${activeViewTab === 'past-events' ? 'var(--teal-accent)' : 'var(--outline)'}; border-bottom: 2px solid ${activeViewTab === 'past-events' ? 'var(--teal-accent)' : 'transparent'}; cursor: pointer; transition: all 0.2s;">
+          Seminar & Webinar Selesai (${pastEvents.length})
+        </button>
+      </div>
+    ` : '';
 
     container.innerHTML = `
       <div class="animate-fade-in" style="padding-bottom: var(--space-12);">
         <!-- Page Header -->
         <div class="flex items-center justify-between mb-8 wrap gap-4">
           <div>
-            <h1 class="page-title">Sponsor & Riwayat Portofolio</h1>
+            <h1 class="page-title">${pageTitle}</h1>
             <div class="breadcrumbs">
               <span>Dashboard</span>
               <span class="separator">/</span>
-              <span class="active">Sponsor & Riwayat</span>
+              <span class="active">${breadcrumbLabel}</span>
             </div>
           </div>
         </div>
 
-        <!-- Metric Cards -->
-        <div class="grid grid-cols-3 gap-6 mb-8" style="grid-template-columns: 1fr 1fr 1fr;">
-          <div class="card flex items-center gap-4" style="padding: var(--space-5); background: var(--surface-container-low); border-left: 4px solid var(--primary);">
-            <div style="background: rgba(30,58,138,0.1); color: var(--primary); width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
-              <span class="material-symbols-outlined" style="font-size: 26px;">handshake</span>
-            </div>
-            <div>
-              <div style="font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2;">${sponsorsList.length}</div>
-              <div style="font-size: 12px; color: var(--outline); font-weight: 600; text-transform: uppercase;">Mitra Sponsor</div>
-            </div>
-          </div>
-
-          <div class="card flex items-center gap-4" style="padding: var(--space-5); background: var(--surface-container-low); border-left: 4px solid var(--teal-accent);">
-            <div style="background: rgba(13,148,136,0.1); color: var(--teal-accent); width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
-              <span class="material-symbols-outlined" style="font-size: 26px;">history</span>
-            </div>
-            <div>
-              <div style="font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2;">${pastEvents.length}</div>
-              <div style="font-size: 12px; color: var(--outline); font-weight: 600; text-transform: uppercase;">Seminar Selesai</div>
-            </div>
-          </div>
-
-          <div class="card flex items-center gap-4" style="padding: var(--space-5); background: var(--surface-container-low); border-left: 4px solid var(--amber-accent);">
-            <div style="background: rgba(245,158,11,0.1); color: var(--amber-accent); width: 48px; height: 48px; border-radius: var(--radius-md); display: flex; align-items: center; justify-content: center;">
-              <span class="material-symbols-outlined" style="font-size: 26px;">workspace_premium</span>
-            </div>
-            <div>
-              <div style="font-size: 24px; font-weight: 800; color: var(--primary); line-height: 1.2;">
-                ${pastEvents.filter(e => e.category === 'Webinar').length}W | ${pastEvents.filter(e => e.category !== 'Webinar').length}S
-              </div>
-              <div style="font-size: 12px; color: var(--outline); font-weight: 600; text-transform: uppercase;">Webinar & Seminar</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Navigation Tabs -->
-        <div class="tabs-container" style="border-bottom: 1px solid var(--border-subtle); display: flex; gap: var(--space-6); margin-bottom: var(--space-6); padding-left: 4px;">
-          <button class="tab-link ${activeViewTab === 'sponsors' ? 'active' : ''}" 
-                  id="tabViewSponsors" 
-                  style="background: none; border: none; font-family: var(--font-heading); font-size: 15px; font-weight: 600; padding: var(--space-2) 0 var(--space-3); color: ${activeViewTab === 'sponsors' ? 'var(--teal-accent)' : 'var(--outline)'}; border-bottom: 2px solid ${activeViewTab === 'sponsors' ? 'var(--teal-accent)' : 'transparent'}; cursor: pointer; transition: all 0.2s;">
-            Daftar Sponsor (${sponsorsList.length})
-          </button>
-          <button class="tab-link ${activeViewTab === 'past-events' ? 'active' : ''}" 
-                  id="tabViewPastEvents" 
-                  style="background: none; border: none; font-family: var(--font-heading); font-size: 15px; font-weight: 600; padding: var(--space-2) 0 var(--space-3); color: ${activeViewTab === 'past-events' ? 'var(--teal-accent)' : 'var(--outline)'}; border-bottom: 2px solid ${activeViewTab === 'past-events' ? 'var(--teal-accent)' : 'transparent'}; cursor: pointer; transition: all 0.2s;">
-            Seminar & Webinar Selesai (${pastEvents.length})
-          </button>
-        </div>
+        ${metricCardsHtml}
+        ${tabsHtml}
 
         <!-- Section Content -->
         <div id="tabContentSection">
@@ -204,6 +252,9 @@ const SponsorsHistoryPage = (() => {
       `;
     }
 
+    const currentUser = Store.getCurrentUser();
+    const isAdmin = currentUser && currentUser.role === 'admin';
+
     return `
       <div class="grid grid-cols-2 gap-6" style="grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));">
         ${events.map((event, idx) => {
@@ -223,6 +274,22 @@ const SponsorsHistoryPage = (() => {
             : `<span class="badge" style="font-size: 11px; background: rgba(59,130,246,0.15); color: #2563eb; border: 1px solid rgba(59,130,246,0.25); padding: 2px 8px; border-radius: 20px; font-weight:600;">SEMINAR</span>`;
 
           const sponsors = event.sponsors || ['Anakku.id', 'InsForge'];
+
+          // Only render sponsors section for admin role
+          const sponsorsBlock = isAdmin ? `
+            <!-- Sponsors badges inside -->
+            <div style="border-top: 1px solid var(--border-subtle); padding-top: var(--space-3); margin-top: var(--space-3);">
+              <div style="font-size: 10px; font-weight: 700; color: var(--outline); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Supported by:</div>
+              <div class="flex flex-wrap gap-1.5">
+                ${sponsors.map(sp => `
+                  <span class="chip-source" style="background: var(--surface-container-high); color: var(--primary); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
+                    <span class="material-symbols-outlined" style="font-size:12px; color: var(--teal-accent);">stars</span>
+                    ${escapeHtml(sp)}
+                  </span>
+                `).join('')}
+              </div>
+            </div>
+          ` : '';
 
           return `
             <div class="card flex flex-col justify-between animate-scale-in" style="padding: 0; background: var(--surface-container-low); border: 1px solid var(--border-subtle); overflow: hidden; transition: transform 0.2s, box-shadow 0.2s;">
@@ -257,18 +324,7 @@ const SponsorsHistoryPage = (() => {
                   </div>
                 </div>
 
-                <!-- Sponsors badges inside -->
-                <div style="border-top: 1px solid var(--border-subtle); padding-top: var(--space-3); margin-top: var(--space-3);">
-                  <div style="font-size: 10px; font-weight: 700; color: var(--outline); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px;">Supported by:</div>
-                  <div class="flex flex-wrap gap-1.5">
-                    ${sponsors.map(sp => `
-                      <span class="chip-source" style="background: var(--surface-container-high); color: var(--primary); font-size: 11px; padding: 2px 8px; border-radius: var(--radius-sm); border: 1px solid var(--border-subtle); font-weight: 600; display: inline-flex; align-items: center; gap: 2px;">
-                        <span class="material-symbols-outlined" style="font-size:12px; color: var(--teal-accent);">stars</span>
-                        ${escapeHtml(sp)}
-                      </span>
-                    `).join('')}
-                  </div>
-                </div>
+                ${sponsorsBlock}
 
               </div>
             </div>
