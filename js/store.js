@@ -350,8 +350,50 @@ const Store = (() => {
           }
         });
 
-        if (signUpRes && signUpRes.data && signUpRes.data.user) {
-          const authId = signUpRes.data.user.id;
+        const signUpError = signUpRes && signUpRes.error;
+        const signUpData = signUpRes && signUpRes.data;
+
+        if (signUpError) {
+          const errMsg = signUpError.message || '';
+          if (errMsg.includes('already exists') || errMsg.includes('duplicate') || errMsg.includes('unique constraint')) {
+            try {
+              const signInRes = await sdk.auth.signInWithPassword({
+                email: user.email,
+                password: user.password
+              });
+              if (signInRes && signInRes.data && signInRes.data.user) {
+                const authId = signInRes.data.user.id;
+                user.id = authId;
+                
+                // Update in local users
+                const idx = users.findIndex(u => u.phone === user.phone);
+                if (idx > -1) {
+                  users[idx].id = authId;
+                  set(KEYS.users, users);
+                }
+                
+                // Also ensure they are present in the public users table in PostgreSQL
+                const { data: dbUser } = await sdk.database.from('users').select('id').eq('id', authId);
+                if (!dbUser || dbUser.length === 0) {
+                  await sdk.database.from('users').insert([{
+                    id: authId,
+                    name: user.name,
+                    phone: user.phone,
+                    password: user.password,
+                    role: user.role,
+                    email: user.email,
+                    created_at: user.createdAt
+                  }]);
+                }
+              }
+            } catch (signInErr) {
+              console.warn("[InsForge] Gagal sign-in fallback:", signInErr);
+            }
+          } else {
+            console.warn("[InsForge] Gagal menyelaraskan pengguna baru (auth error):", signUpError);
+          }
+        } else if (signUpData && signUpData.user) {
+          const authId = signUpData.user.id;
           user.id = authId;
           
           // Update in local users
@@ -373,8 +415,9 @@ const Store = (() => {
           }]);
         }
       } catch (err) {
-        // Handle duplicate key (email already exists in Auth)
-        if (err.message && (err.message.includes('already exists') || err.message.includes('duplicate') || err.message.includes('unique constraint'))) {
+        // Handle duplicate key (email already exists in Auth) for thrown exceptions
+        const errMsg = err.message || '';
+        if (errMsg.includes('already exists') || errMsg.includes('duplicate') || errMsg.includes('unique constraint')) {
           try {
             const signInRes = await sdk.auth.signInWithPassword({
               email: user.email,
