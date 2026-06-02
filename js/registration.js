@@ -312,54 +312,62 @@ const RegistrationPage = (() => {
       `;
     }
 
-    setTimeout(() => {
-      // 1. Create Peserta User Account
-      const userRes = Store.addUser({
-        name: participantName,
-        phone: participantPhone,
-        password: '123456',
-        role: 'peserta'
-      });
+    setTimeout(async () => {
+      try {
+        // 1. Create Peserta User Account
+        const userRes = await Store.addUser({
+          name: participantName,
+          phone: participantPhone,
+          password: '123456',
+          role: 'peserta'
+        });
 
-      // Account might already exist, get user id
-      let userId = '';
-      if (userRes.success) {
-        userId = userRes.user.id;
-      } else {
-        const existingUser = Store.getUserByPhone(participantPhone);
-        if (existingUser) {
-          userId = existingUser.id;
+        // Account might already exist, get user id
+        let userId = '';
+        if (userRes.success) {
+          userId = userRes.user.id;
         } else {
-          App.showToast('Gagal membuat akun peserta.', 'error');
+          const existingUser = Store.getUserByPhone(participantPhone);
+          if (existingUser) {
+            userId = existingUser.id;
+          } else {
+            App.showToast('Gagal membuat akun peserta.', 'error');
+            if (btnSubmit) {
+              btnSubmit.disabled = false;
+              btnSubmit.innerHTML = `Selesaikan Pendaftaran <span class="material-symbols-outlined" style="font-size:20px;">arrow_forward</span>`;
+            }
+            return;
+          }
+        }
+
+        // 2. Add Event Registration
+        const regRes = await Store.addRegistration({
+          eventId: selectedEvent.id,
+          userId: userId,
+          name: participantName,
+          phone: participantPhone,
+          responses: responses
+        });
+
+        if (!regRes.success) {
+          App.showToast(regRes.error || 'Anda sudah terdaftar untuk event ini!', 'error');
           if (btnSubmit) {
             btnSubmit.disabled = false;
             btnSubmit.innerHTML = `Selesaikan Pendaftaran <span class="material-symbols-outlined" style="font-size:20px;">arrow_forward</span>`;
           }
           return;
         }
-      }
 
-      // 2. Add Event Registration
-      const regRes = Store.addRegistration({
-        eventId: selectedEvent.id,
-        userId: userId,
-        name: participantName,
-        phone: participantPhone,
-        responses: responses
-      });
-
-      if (!regRes.success) {
-        App.showToast(regRes.error || 'Anda sudah terdaftar untuk event ini!', 'error');
+        // 3. Render Success View
+        renderSuccessScreen(participantName, participantPhone);
+      } catch (err) {
+        console.error("Registration error:", err);
+        App.showToast('Terjadi kesalahan saat memproses pendaftaran.', 'error');
         if (btnSubmit) {
           btnSubmit.disabled = false;
           btnSubmit.innerHTML = `Selesaikan Pendaftaran <span class="material-symbols-outlined" style="font-size:20px;">arrow_forward</span>`;
         }
-        return;
       }
-
-      // 3. Render Success View
-      renderSuccessScreen(participantName, participantPhone);
-
     }, 1500);
   }
 

@@ -606,7 +606,7 @@ const ParticipantsPage = (() => {
     setTimeout(() => {
       const saveBtn = document.getElementById('btnSaveManualParticipant');
       if (saveBtn) {
-        saveBtn.addEventListener('click', () => {
+        saveBtn.addEventListener('click', async () => {
           const eventId = document.getElementById('manualEvent').value;
           const name = document.getElementById('manualName').value.trim();
           const phoneInput = document.getElementById('manualPhone').value.trim();
@@ -626,41 +626,46 @@ const ParticipantsPage = (() => {
             return;
           }
 
-          // Create account
-          const userRes = Store.addUser({ name, phone, password: '123456', role: 'peserta' });
-          let userId = '';
-          if (userRes.success) {
-            userId = userRes.user.id;
-          } else {
-            const exUser = Store.getUserByPhone(phone);
-            if (exUser) userId = exUser.id;
+          try {
+            // Create account
+            const userRes = await Store.addUser({ name, phone, password: '123456', role: 'peserta' });
+            let userId = '';
+            if (userRes.success) {
+              userId = userRes.user.id;
+            } else {
+              const exUser = Store.getUserByPhone(phone);
+              if (exUser) userId = exUser.id;
+            }
+
+            const responses = [
+              { label: 'Nama Lengkap', value: name },
+              { label: 'Nomor WhatsApp', value: phone },
+              { label: 'Usia Anda (Tahun)', value: usiaIbu || '-' },
+              { label: 'Usia Anak (Tahun)', value: usiaAnak || '-' },
+              { label: 'Kecamatan Domisili', value: kecamatan || '-' },
+              { label: 'Mengetahui Informasi Seminar Dari', value: sumber }
+            ];
+
+            const regRes = await Store.addRegistration({
+              eventId,
+              userId,
+              name,
+              phone,
+              responses
+            });
+
+            if (!regRes.success) {
+              App.showToast(regRes.error || 'Gagal menambahkan registrasi manual!', 'error');
+              return;
+            }
+
+            App.showToast('Peserta manual berhasil didaftarkan!', 'success');
+            App.closeModal();
+            render();
+          } catch (err) {
+            console.error("Manual participant addition failed:", err);
+            App.showToast('Terjadi kesalahan saat menyimpan peserta.', 'error');
           }
-
-          const responses = [
-            { label: 'Nama Lengkap', value: name },
-            { label: 'Nomor WhatsApp', value: phone },
-            { label: 'Usia Anda (Tahun)', value: usiaIbu || '-' },
-            { label: 'Usia Anak (Tahun)', value: usiaAnak || '-' },
-            { label: 'Kecamatan Domisili', value: kecamatan || '-' },
-            { label: 'Mengetahui Informasi Seminar Dari', value: sumber }
-          ];
-
-          const regRes = Store.addRegistration({
-            eventId,
-            userId,
-            name,
-            phone,
-            responses
-          });
-
-          if (!regRes.success) {
-            App.showToast(regRes.error || 'Gagal menambahkan registrasi manual!', 'error');
-            return;
-          }
-
-          App.showToast('Peserta manual berhasil didaftarkan!', 'success');
-          App.closeModal();
-          render();
         });
       }
     }, 100);

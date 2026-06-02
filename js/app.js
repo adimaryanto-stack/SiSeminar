@@ -106,6 +106,8 @@ const App = (() => {
         renderPesertaLayout(() => ChatPage.render());
       } else if (route === 'checkin-peserta') {
         renderPesertaLayout(() => AttendancePage.renderPesertaCheckin());
+      } else if (route === 'list-seminar') {
+        renderPesertaLayout(() => ListSeminarPage.render());
       } else {
         navigate('chat');
       }
@@ -242,6 +244,10 @@ const App = (() => {
           <button class="sidebar-nav-item ${activeRoute === 'chat' ? 'active' : ''}" onclick="App.navigate('chat')">
             <span class="material-symbols-outlined">forum</span>
             Chat Grup
+          </button>
+          <button class="sidebar-nav-item ${activeRoute === 'list-seminar' ? 'active' : ''}" onclick="App.navigate('list-seminar')">
+            <span class="material-symbols-outlined">event_note</span>
+            List Seminar
           </button>
           <button class="sidebar-nav-item ${activeRoute === 'checkin-peserta' ? 'active' : ''}" onclick="App.navigate('checkin-peserta')">
             <span class="material-symbols-outlined">qr_code_scanner</span>
