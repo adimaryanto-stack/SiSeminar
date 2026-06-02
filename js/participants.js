@@ -411,10 +411,14 @@ const ParticipantsPage = (() => {
     });
 
     document.querySelectorAll('.btn-delete-reg').forEach(btn => {
-      btn.addEventListener('click', () => {
+      btn.addEventListener('click', async () => {
         if (confirm('Apakah Anda yakin ingin menghapus peserta ini dari daftar seminar?')) {
-          Store.deleteRegistration(btn.dataset.id);
-          App.showToast('Peserta berhasil dihapus dari direktori.', 'success');
+          const res = await Store.deleteRegistration(btn.dataset.id);
+          if (res && !res.success) {
+            App.showToast(res.error || 'Gagal menghapus peserta dari database!', 'error');
+          } else {
+            App.showToast('Peserta berhasil dihapus dari direktori.', 'success');
+          }
           activeMenuRegistrationId = null;
           render();
         }
@@ -623,6 +627,16 @@ const ParticipantsPage = (() => {
           const phone = Store.normalizePhone(phoneInput);
           if (phone.length < 9) {
             App.showToast('Format Nomor WhatsApp tidak valid!', 'error');
+            return;
+          }
+
+          // Early check: Is this phone number already registered for this event?
+          const isPhoneAlreadyRegistered = Store.getAllRegistrations().some(r => 
+            r.eventId === eventId && 
+            Store.normalizePhone(r.phone) === phone
+          );
+          if (isPhoneAlreadyRegistered) {
+            App.showToast('Nomor WhatsApp tersebut sudah terdaftar di event ini!', 'error');
             return;
           }
 

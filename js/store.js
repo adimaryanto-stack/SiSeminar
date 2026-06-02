@@ -514,7 +514,36 @@ const Store = (() => {
     }
 
     // Auto-create default chat group
-    await addChatGroup({ eventId: event.id, name: 'Grup Umum - ' + event.title, description: 'Grup chat utama untuk event ini' });
+    await addChatGroup({
+      eventId: event.id,
+      name: 'Grup Umum - ' + event.title,
+      description: 'Grup chat utama untuk event ini'
+    });
+
+    // Auto-create default registration form fields
+    const defaultFields = [
+      { label: 'Nama Lengkap', fieldType: 'text', isRequired: true, placeholder: 'Masukkan nama lengkap Anda', orderIndex: 0 },
+      { label: 'Nomor WhatsApp', fieldType: 'text', isRequired: true, placeholder: '8xxxxxxxxxx', orderIndex: 1 },
+      { label: 'Usia Anda (Tahun)', fieldType: 'number', isRequired: true, placeholder: 'Contoh: 28', orderIndex: 2 },
+      { label: 'Usia Anak (Tahun)', fieldType: 'number', isRequired: true, placeholder: 'Contoh: 3', orderIndex: 3 },
+      { label: 'Kecamatan Domisili', fieldType: 'text', isRequired: true, placeholder: 'Contoh: Klojen', orderIndex: 4 },
+      {
+        label: 'Mengetahui Informasi Seminar Dari',
+        fieldType: 'dropdown',
+        isRequired: true,
+        placeholder: 'Pilih salah satu...',
+        options: ['Instagram', 'Facebook', 'Teman/Keluarga', 'Komunitas WhatsApp', 'Website', 'Lainnya'],
+        orderIndex: 5
+      }
+    ];
+
+    for (const f of defaultFields) {
+      await addFormField({
+        eventId: event.id,
+        ...f
+      });
+    }
+
     return event;
   }
 
@@ -548,10 +577,34 @@ const Store = (() => {
   }
 
   async function deleteEvent(id) {
+    // 1. Delete associated registrations and attendance locally
+    set(KEYS.registrations, get(KEYS.registrations).filter(r => r.eventId !== id));
+    set(KEYS.attendance, get(KEYS.attendance).filter(a => a.eventId !== id));
+
+    // 2. Delete associated form fields locally
+    set(KEYS.formFields, get(KEYS.formFields).filter(f => f.eventId !== id));
+
+    // 3. Delete associated chat groups, members, and messages locally
+    const groupsToDelete = get(KEYS.chatGroups).filter(g => g.eventId === id);
+    const groupIds = groupsToDelete.map(g => g.id);
+    set(KEYS.chatGroups, get(KEYS.chatGroups).filter(g => g.eventId !== id));
+    set(KEYS.chatMembers, get(KEYS.chatMembers).filter(m => !groupIds.includes(m.groupId)));
+    set(KEYS.messages, get(KEYS.messages).filter(m => !groupIds.includes(m.groupId)));
+
+    // 4. Delete the event locally
     set(KEYS.events, get(KEYS.events).filter(e => e.id !== id));
+
+    // 5. Sync deletions with InsForge database in background
     const sdk = await ensureSdk();
     if (sdk) {
       try {
+        // Delete child references first
+        await sdk.database.from('form_fields').delete().eq('event_id', id);
+        await sdk.database.from('chat_groups').delete().eq('event_id', id);
+        await sdk.database.from('registrations').delete().eq('event_id', id);
+        await sdk.database.from('attendance').delete().eq('event_id', id);
+
+        // Finally delete the event
         await sdk.database.from('events').delete().eq('id', id);
       } catch (err) {
         console.warn("[InsForge] Gagal menghapus event di cloud:", err);
@@ -674,6 +727,8 @@ const Store = (() => {
   async function addRegistration(regData) {
     const regs = get(KEYS.registrations);
     const normalizedPhone = normalizePhone(regData.phone || regData.responses?.find(r => r.label?.toLowerCase().includes('whatsapp'))?.value || '');
+    
+    // 1. Memory check (cache)
     const existing = regs.find(r => r.eventId === regData.eventId && normalizePhone(r.phone) === normalizedPhone);
     if (existing) return { success: false, error: 'Anda sudah terdaftar di event ini' };
 
@@ -687,14 +742,21 @@ const Store = (() => {
       status: 'confirmed',
       submittedAt: new Date().toISOString()
     };
-    regs.push(reg);
-    set(KEYS.registrations, regs);
 
-    // Sync to InsForge
+    // 2. Sync and write to InsForge first to leverage UNIQUE constraints
     const sdk = await ensureSdk();
     if (sdk) {
       try {
-        await sdk.database.from('registrations').insert([{
+        // Query cloud DB first to be 100% sure in case of stale cache or another device
+        const { data: dbRegs } = await sdk.database.from('registrations')
+          .select('id')
+          .eq('event_id', reg.eventId)
+          .eq('phone', reg.phone);
+        if (dbRegs && dbRegs.length > 0) {
+          return { success: false, error: 'Anda sudah terdaftar di event ini' };
+        }
+
+        const { error: insertError } = await sdk.database.from('registrations').insert([{
           id: reg.id,
           event_id: reg.eventId,
           user_id: reg.userId,
@@ -704,10 +766,27 @@ const Store = (() => {
           status: reg.status,
           submitted_at: reg.submittedAt
         }]);
+
+        if (insertError) {
+          const errMsg = insertError.message || '';
+          if (errMsg.includes('unique_event_phone') || errMsg.includes('duplicate') || errMsg.includes('unique constraint')) {
+            return { success: false, error: 'Anda sudah terdaftar di event ini' };
+          }
+          return { success: false, error: 'Gagal menyimpan pendaftaran ke database: ' + errMsg };
+        }
       } catch (err) {
-        console.warn("[InsForge] Gagal menyelaraskan registrasi:", err);
+        console.warn("[InsForge] Exception inserting registration:", err);
+        const errMsg = err.message || '';
+        if (errMsg.includes('unique_event_phone') || errMsg.includes('duplicate') || errMsg.includes('unique constraint')) {
+          return { success: false, error: 'Anda sudah terdaftar di event ini' };
+        }
+        return { success: false, error: 'Terjadi kesalahan sinkronisasi pendaftaran.' };
       }
     }
+
+    // 3. Insert succeeded, now update local state
+    regs.push(reg);
+    set(KEYS.registrations, regs);
 
     // Update event participant count
     const event = getEventById(regData.eventId);
@@ -746,15 +825,42 @@ const Store = (() => {
   }
 
   async function deleteRegistration(id) {
-    set(KEYS.registrations, get(KEYS.registrations).filter(r => r.id !== id));
+    const regs = get(KEYS.registrations);
+    const regToDelete = regs.find(r => r.id === id);
+    if (!regToDelete) return { success: false, error: 'Registrasi tidak ditemukan' };
+
+    const originalRegs = [...regs];
+    set(KEYS.registrations, regs.filter(r => r.id !== id));
+
     const sdk = await ensureSdk();
     if (sdk) {
       try {
-        await sdk.database.from('registrations').delete().eq('id', id);
+        const { error } = await sdk.database.from('registrations').delete().eq('id', id);
+        if (error) {
+          console.warn("[InsForge] Gagal menghapus registrasi di cloud:", error);
+          set(KEYS.registrations, originalRegs); // Rollback
+          return { success: false, error: error.message };
+        }
       } catch (err) {
-        console.warn("[InsForge] Gagal menghapus registrasi di cloud:", err);
+        console.warn("[InsForge] Exception menghapus registrasi di cloud:", err);
+        set(KEYS.registrations, originalRegs); // Rollback
+        return { success: false, error: err.message };
       }
     }
+
+    // Decrement event participant count
+    const event = getEventById(regToDelete.eventId);
+    if (event) {
+      await updateEvent(event.id, { participantCount: Math.max(0, (event.participantCount || 0) - 1) });
+    }
+
+    // Auto remove from all chat groups for this event
+    const groups = getChatGroups(regToDelete.eventId);
+    for (const g of groups) {
+      await removeChatMember(g.id, regToDelete.userId);
+    }
+
+    return { success: true };
   }
 
   // ============ Chat Groups ============

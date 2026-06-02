@@ -333,6 +333,22 @@ const RegistrationPage = (() => {
 
     setTimeout(async () => {
       try {
+        // 0. Early check: Is this phone number already registered for this event?
+        const isPhoneAlreadyRegistered = Store.getAllRegistrations().some(r => 
+          r.eventId === selectedEvent.id && 
+          Store.normalizePhone(r.phone) === Store.normalizePhone(participantPhone)
+        );
+
+        if (isPhoneAlreadyRegistered) {
+          App.showToast('Anda sudah terdaftar untuk event ini! Mengarahkan ke portal...', 'info');
+          await Store.login(participantPhone, '123456');
+          setTimeout(() => {
+            window.location.hash = '#list-seminar';
+            window.location.reload();
+          }, 1500);
+          return;
+        }
+
         // 1. Create Peserta User Account
         const userRes = await Store.addUser({
           name: participantName,

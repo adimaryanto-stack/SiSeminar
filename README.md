@@ -123,11 +123,20 @@ Setelah proses deploy berhasil, CLI akan memberikan URL Live aplikasi Anda (sepe
 
 ---
 
-## 🔒 Keamanan & Aturan Data (RLS Policies)
-Proyek ini mengimplementasikan aturan keamanan ketat berbasis **Row Level Security (RLS)** pada database PostgreSQL:
+## 🔒 Keamanan & Aturan Data (RLS & Validation Policies)
+Proyek ini mengimplementasikan aturan keamanan ketat berbasis **Row Level Security (RLS)** dan validasi integritas unik pada database PostgreSQL:
 1.  Setiap data pendaftaran (`registrations`) dan presensi (`attendance`) secara otomatis dikaitkan dengan `user_id` milik pengguna yang sedang login.
 2.  Peserta hanya memiliki hak akses baca/tulis terhadap data pribadi mereka sendiri.
 3.  Hanya user dengan role `'admin'` yang memiliki hak istimewa (baca semua data, tambah/hapus grup, ekspor data, edit form builder).
+4.  **Validasi Unik Nomor WhatsApp (`unique_event_phone`):** Kolom `(event_id, phone)` pada tabel `registrations` dilindungi oleh PostgreSQL Composite UNIQUE Constraint, yang membatasi agar satu nomor WhatsApp tidak dapat didaftarkan lebih dari sekali pada event/seminar yang sama.
+
+---
+
+## 🛡️ Aturan Siklus Hidup Event & Cascade Deletion
+Untuk menjamin tidak adanya data sampah (*dangling/orphan references*) dan menjaga integritas database:
+1.  **Auto-Initialization Event:** Saat admin membuat event baru, sistem otomatis membuat satu **grup chat umum** (`Grup Umum - ...`) dan menginisialisasi **formulir registrasi default** berisi 6 kolom standar (Nama, Nomor WhatsApp, Usia Ibu, Usia Anak, Kecamatan, dan Sumber Info) pada PostgreSQL.
+2.  **Cascade Deletion:** Menghapus event melalui menu **Hapus Event** di dashboard admin akan secara otomatis menghapus seluruh baris data pada tabel `form_fields`, `chat_groups`, `chat_members`, `messages`, `registrations`, dan `attendance` yang terhubung dengan event tersebut, baik di cloud database PostgreSQL maupun memori lokal.
+3.  **Hapus Peserta Terintegrasi:** Menghapus peserta secara asinkron dari Direktori Peserta otomatis mengurangi jumlah pendaftar event (`participantCount`) dan mengeluarkan akun peserta dari seluruh grup koordinasi event.
 
 ---
 

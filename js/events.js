@@ -192,9 +192,14 @@ const EventsPage = (() => {
             <span class="material-symbols-outlined" style="font-size: 16px;">link</span>
             Link Registrasi
           </a>
-          <button class="btn-broadcast-event topbar-icon-btn" data-id="${event.id}" data-title="${escapeHtml(event.title)}" title="Kirim Broadcast ke Grup Chat" style="padding: 2px; color: var(--primary);">
-            <span class="material-symbols-outlined">campaign</span>
-          </button>
+          <div style="display: flex; gap: 8px; align-items: center;">
+            <button class="btn-broadcast-event topbar-icon-btn" data-id="${event.id}" data-title="${escapeHtml(event.title)}" title="Kirim Broadcast ke Grup Chat" style="padding: 2px; color: var(--primary);">
+              <span class="material-symbols-outlined" style="font-size: 20px;">campaign</span>
+            </button>
+            <button class="btn-delete-event topbar-icon-btn" data-id="${event.id}" data-title="${escapeHtml(event.title)}" title="Hapus Event" style="padding: 2px; color: var(--destructive-red);">
+              <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
+            </button>
+          </div>
         </div>
       </div>
     `;
@@ -262,6 +267,20 @@ const EventsPage = (() => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         openBroadcastModal(btn.dataset.id, btn.dataset.title);
+      });
+    });
+
+    // Delete Event Button
+    document.querySelectorAll('.btn-delete-event').forEach(btn => {
+      btn.addEventListener('click', async (e) => {
+        e.stopPropagation();
+        const id = btn.dataset.id;
+        const title = btn.dataset.title;
+        if (confirm(`Apakah Anda yakin ingin menghapus event "${title}" secara permanen?\n\nTindakan ini juga akan menghapus seluruh formulir kustom, grup chat, riwayat pesan, daftar hadir, dan pendaftaran untuk event ini!`)) {
+          await Store.deleteEvent(id);
+          App.showToast('Event berhasil dihapus!', 'success');
+          render();
+        }
       });
     });
   }
@@ -397,33 +416,19 @@ const EventsPage = (() => {
 
           const eventData = { title, description, date, status, location };
 
-          if (isEdit) {
-            Store.updateEvent(eventId, eventData);
-            App.showToast('Event berhasil diperbarui!', 'success');
-          } else {
-            const newEv = Store.addEvent(eventData);
-            // Pre-populate Form Builder with basic fields for new event
-            Store.addFormField({
-              eventId: newEv.id,
-              label: 'Nama Lengkap',
-              fieldType: 'text',
-              isRequired: true,
-              placeholder: 'Masukkan nama lengkap',
-              orderIndex: 0
-            });
-            Store.addFormField({
-              eventId: newEv.id,
-              label: 'Nomor WhatsApp',
-              fieldType: 'text',
-              isRequired: true,
-              placeholder: '08xxxxxxxxxx',
-              orderIndex: 1
-            });
-            App.showToast('Event baru berhasil dibuat!', 'success');
-          }
+          (async () => {
+            if (isEdit) {
+              await Store.updateEvent(eventId, eventData);
+              App.showToast('Event berhasil diperbarui!', 'success');
+            } else {
+              // Store.addEvent now automatically creates general chat group and default form fields inside the data store layer
+              await Store.addEvent(eventData);
+              App.showToast('Event baru berhasil dibuat!', 'success');
+            }
 
-          App.closeModal();
-          render();
+            App.closeModal();
+            render();
+          })();
         });
       }
     }, 100);

@@ -145,8 +145,9 @@ Menyimpan riwayat isian formulir registrasi kustom peserta.
 *   `name` (TEXT)
 *   `phone` (TEXT)
 *   `responses` (JSONB, menyimpan objek kunci-nilai dari jawaban field dinamis)
-*   `status` (TEXT, ENUM: `'pending'`, `'approved'`)
+*   `status` (TEXT, ENUM: `'confirmed'`, `'pending'`, `'cancelled'`)
 *   `submitted_at` (TIMESTAMP)
+*   **Constraint Unik (Composite UNIQUE Constraint):** Kolom `(event_id, phone)` ditambahkan constraint unik `unique_event_phone`. Aturan ini menjamin satu nomor WhatsApp tidak dapat didaftarkan lebih dari satu kali pada seminar/event yang sama.
 
 #### 5. Tabel: `chat_groups`
 Menyimpan konfigurasi grup obrolan per event seminar.
@@ -236,6 +237,34 @@ Demi menjamin keamanan dan privasi data peserta seminar, kebijakan keamanan data
     *   Hanya admin atau pengguna yang memiliki `sender_id = auth.uid()` yang diizinkan memodifikasi pesan mereka sendiri.
 3.  **Unggah Berkas Storage:**
     *   Folder upload di InsForge Storage dibagi menjadi `/banners` (hanya admin yang dapat menulis) dan `/chat` (semua pengguna terautentikasi dapat mengunggah gambar lampiran chat).
+
+---
+
+## 8. Integritas Data & Siklus Event (Cascade Rules)
+
+Demi menjaga kebersihan dan konsistensi data antara database cloud PostgreSQL dan cache penyimpanan lokal (`localStorage`), siklus hidup event dan pendaftaran menerapkan aturan integritas terikat secara otomatis:
+
+### 8.1 Pembuatan Event Baru (Auto-Initialization)
+Ketika event baru berhasil ditambahkan oleh administrator:
+1.  **Formulir Standar (6 Kolom):** Sistem secara otomatis menginisialisasi tabel `form_fields` dengan 6 jenis isian standar:
+    *   *Nama Lengkap* (Teks, Wajib)
+    *   *Nomor WhatsApp* (Teks, Wajib)
+    *   *Usia Anda (Tahun)* (Angka, Wajib)
+    *   *Usia Anak (Tahun)* (Angka, Wajib)
+    *   *Kecamatan Domisili* (Teks, Wajib)
+    *   *Mengetahui Informasi Seminar Dari* (Dropdown, Wajib, opsi: Instagram, Facebook, Teman/Keluarga, Komunitas WhatsApp, Website, Lainnya)
+2.  **Grup Chat Umum:** Sistem secara otomatis membuat satu grup chat koordinasi baru pada tabel `chat_groups` bernama `Grup Umum - [Judul Event]`.
+
+### 8.2 Penghapusan Event (Cascade Deletion)
+Ketika sebuah event dihapus secara permanen oleh administrator dari antarmuka Manajemen Event:
+1.  **Pembersihan Relasi Lokal & DB:** Sistem secara otomatis memicu penghapusan berantai (*cascade delete*) pada seluruh entitas anak yang terikat dengan ID event tersebut di cloud database PostgreSQL dan memori lokal:
+    *   `form_fields` (Seluruh kolom formulir kustom)
+    *   `chat_groups` (Grup obrolan)
+    *   `chat_members` (Daftar anggota obrolan)
+    *   `messages` (Riwayat log pesan grup chat)
+    *   `registrations` (Data isian pendaftaran peserta)
+    *   `attendance` (Data log presensi kehadiran)
+2.  Hal ini menjamin tidak adanya data yatim piatu (*dangling/orphan data*) yang tertinggal dalam database.
 
 ---
 
