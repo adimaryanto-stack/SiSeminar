@@ -39,6 +39,34 @@ const RegistrationPage = (() => {
 
     formFields = Store.getFormFields(eventId);
 
+    // Ensure Nama Lengkap and Nomor WhatsApp fields always exist to prevent broken registration flow
+    const hasPhone = formFields.some(f => f.fieldType === 'text' && /whatsapp|(?:\b|_)wa(?:\b|_)|telepon|telp|telpon|phone|hp|kontak/i.test(f.label));
+    const hasName = formFields.some(f => f.fieldType === 'text' && /nama|name/i.test(f.label));
+
+    if (!hasPhone) {
+      formFields.unshift({
+        id: 'default_whatsapp',
+        eventId: eventId,
+        label: 'Nomor WhatsApp',
+        fieldType: 'text',
+        isRequired: true,
+        placeholder: '8xxxxxxxxxx',
+        orderIndex: -1
+      });
+    }
+
+    if (!hasName) {
+      formFields.unshift({
+        id: 'default_name',
+        eventId: eventId,
+        label: 'Nama Lengkap',
+        fieldType: 'text',
+        isRequired: true,
+        placeholder: 'Masukkan nama lengkap Anda',
+        orderIndex: -2
+      });
+    }
+
     const formattedDate = App.formatDate(selectedEvent.date);
 
     container.innerHTML = `
