@@ -83,8 +83,8 @@ const Store = (() => {
   async function ensureSdk() {
     if (sdkLoaded) return sdkLoaded;
     try {
-      // Dynamically import the ESM bundle from jsDelivr
-      const module = await import('https://cdn.jsdelivr.net/npm/@insforge/sdk@1.3.0/dist/index.mjs');
+      // Dynamically import the ESM bundle from esm.run
+      const module = await import('https://esm.run/@insforge/sdk@1.3.0');
       window.insforge = module.createClient({
         baseUrl: 'https://yf9g53qm.ap-southeast.insforge.app',
         anonKey: 'ik_27bb066827cca211bd663f03ae24d47a'
