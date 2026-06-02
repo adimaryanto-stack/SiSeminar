@@ -316,34 +316,34 @@ GET    /api/events/:id/questionnaire/results
 
 ### Sprint 1 — Foundation + Form Registrasi *(2 minggu)*
 
-- [ ] Auth sistem (register/login)
-- [ ] Buat & kelola event
-- [ ] Builder form registrasi (admin) — tambah/edit/hapus field
-- [ ] Halaman registrasi peserta dengan klausa persetujuan anakku.id
-- [ ] Auto join grup setelah submit berhasil
+- [x] Auth sistem (register/login)
+- [x] Buat & kelola event
+- [x] Builder form registrasi (admin) — tambah/edit/hapus field
+- [x] Halaman registrasi peserta dengan klausa persetujuan anakku.id
+- [x] Auto join grup setelah submit berhasil
 
 ### Sprint 2 — Multi Grup Chat + Komunikasi *(2 minggu)*
 
-- [ ] Buat banyak grup per event
-- [ ] Upload banner/thumbnail per grup chat
-- [ ] Real-time chat per grup (Socket.io / Supabase Realtime)
-- [ ] Broadcast announcement oleh admin
-- [ ] QR Code presensi + check-in peserta
+- [x] Buat banyak grup per event
+- [x] Upload banner/thumbnail per grup chat
+- [x] Real-time chat per grup (Socket.io / Supabase Realtime)
+- [x] Broadcast announcement oleh admin
+- [x] QR Code presensi + check-in peserta
 
 ### Sprint 3 — Data Peserta + Feedback *(1–2 minggu)*
 
-- [ ] Dashboard spreadsheet data peserta (tabel, filter, sortir)
-- [ ] Export CSV / Excel data peserta
-- [ ] Builder kuesioner (rating, pilihan, teks bebas)
-- [ ] Form pengisian kuesioner peserta
-- [ ] Statistik dashboard admin
+- [x] Dashboard spreadsheet data peserta (tabel, filter, sortir)
+- [x] Export CSV / Excel data peserta
+- [x] Builder kuesioner (rating, pilihan, teks bebas)
+- [x] Form pengisian kuesioner peserta
+- [x] Statistik dashboard admin
 
 ### Sprint 4 — Polish + Deploy *(1 minggu)*
 
-- [ ] Mobile responsive optimization
-- [ ] Upload gambar ke Supabase Storage (banner, dresscode)
-- [ ] Deploy ke Vercel + Supabase production
-- [ ] Testing end-to-end
+- [x] Mobile responsive optimization
+- [x] Upload gambar ke Supabase Storage (banner, dresscode)
+- [x] Deploy ke Vercel + Supabase production
+- [x] Testing end-to-end
 
 ---
 
