@@ -250,7 +250,7 @@ const Store = (() => {
         email: data.user.email,
         name: profile.name || data.user.email.split('@')[0],
         phone: profile.phone || normalizePhone(identifier),
-        role: data.user.email.includes('admin') || data.user.id === 'admin_001' ? 'admin' : 'peserta'
+        role: data.user.email.includes('admin') || data.user.id === '33c4138c-89f1-4922-a2e9-740e53d07407' || data.user.email === '6287881527804@siseminar.com' || data.user.id === 'admin_001' ? 'admin' : 'peserta'
       };
 
       setObj(KEYS.currentUser, sessionUser);
