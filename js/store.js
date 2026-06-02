@@ -933,7 +933,7 @@ const Store = (() => {
     if (localStorage.getItem(KEYS.initialized) && get(KEYS.events).length > 0) return;
 
     // Admin user
-    const adminId = 'admin_001';
+    const adminId = '33c4138c-89f1-4922-a2e9-740e53d07407';
     const admin = {
       id: adminId,
       name: 'Admin SiSeminar',
@@ -945,7 +945,7 @@ const Store = (() => {
 
     // Peserta demo
     const peserta = [
-      { id: 'user_001', name: 'Sarah Mitchell', phone: '628123456789', password: '123456', role: 'peserta', createdAt: '2024-09-15T08:00:00.000Z' },
+      { id: 'fbba9d49-0d7f-4111-ad3e-307734233cbd', name: 'Sarah Mitchell', phone: '628123456789', password: '123456', role: 'peserta', createdAt: '2024-09-15T08:00:00.000Z' },
       { id: 'user_002', name: 'David Wilson', phone: '628119988776', password: '123456', role: 'peserta', createdAt: '2024-09-16T10:00:00.000Z' },
       { id: 'user_003', name: 'Elena Lavoie', phone: '628131122334', password: '123456', role: 'peserta', createdAt: '2024-09-17T09:00:00.000Z' },
       { id: 'user_004', name: 'Robert Brown', phone: '628124455667', password: '123456', role: 'peserta', createdAt: '2024-09-18T11:00:00.000Z' },
