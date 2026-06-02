@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SiSeminar - Event Management</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            vertical-align: middle;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #F8FAFC;
+        }
+        .sidebar-active {
+            font-variation-settings: 'FILL' 1;
+        }
+    </style>
+<script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                      "border-subtle": "#E2E8F0",
+                      "success-green": "#10B981",
+                      "outline": "#757682",
+                      "inverse-on-surface": "#eaf1ff",
+                      "tertiary-container": "#5c3800",
+                      "inverse-surface": "#213145",
+                      "background": "#f8f9ff",
+                      "tertiary-fixed": "#ffddb8",
+                      "on-surface-variant": "#444651",
+                      "tertiary-fixed-dim": "#ffb95f",
+                      "on-secondary-container": "#006f66",
+                      "secondary-fixed": "#89f5e7",
+                      "admin-blue-dark": "#172554",
+                      "outline-variant": "#c5c5d3",
+                      "on-tertiary-fixed-variant": "#653e00",
+                      "on-primary-container": "#90a8ff",
+                      "destructive-red": "#EF4444",
+                      "on-secondary-fixed": "#00201d",
+                      "surface-dim": "#cbdbf5",
+                      "error-container": "#ffdad6",
+                      "primary-fixed": "#dce1ff",
+                      "on-error": "#ffffff",
+                      "on-tertiary-container": "#ef9900",
+                      "error": "#ba1a1a",
+                      "on-tertiary-fixed": "#2a1700",
+                      "on-error-container": "#93000a",
+                      "on-primary-fixed": "#00164e",
+                      "primary-fixed-dim": "#b6c4ff",
+                      "surface-container": "#e5eeff",
+                      "inverse-primary": "#b6c4ff",
+                      "primary": "#00236f",
+                      "on-surface": "#0b1c30",
+                      "secondary-fixed-dim": "#6bd8cb",
+                      "secondary": "#006a61",
+                      "surface-container-lowest": "#ffffff",
+                      "secondary-container": "#86f2e4",
+                      "surface-container-high": "#dce9ff",
+                      "surface-container-low": "#eff4ff",
+                      "surface-tint": "#4059aa",
+                      "surface-bg": "#F8FAFC",
+                      "surface": "#f8f9ff",
+                      "on-primary-fixed-variant": "#264191",
+                      "on-background": "#0b1c30",
+                      "tertiary": "#3e2400",
+                      "on-secondary-fixed-variant": "#005049",
+                      "on-secondary": "#ffffff",
+                      "surface-container-highest": "#d3e4fe",
+                      "on-tertiary": "#ffffff",
+                      "surface-bright": "#f8f9ff",
+                      "surface-variant": "#d3e4fe",
+                      "primary-container": "#1e3a8a",
+                      "on-primary": "#ffffff",
+                      "teal-accent": "#14B8A6"
+              },
+              "borderRadius": {
+                      "DEFAULT": "0.125rem",
+                      "lg": "0.25rem",
+                      "xl": "0.5rem",
+                      "full": "0.75rem"
+              },
+              "spacing": {
+                      "base": "4px",
+                      "gutter": "24px",
+                      "margin-desktop": "40px",
+                      "margin-mobile": "16px",
+                      "container-max": "1280px"
+              },
+              "fontFamily": {
+                      "label-md": ["Inter"],
+                      "body-sm": ["Inter"],
+                      "label-sm": ["Inter"],
+                      "body-md": ["Inter"],
+                      "body-lg": ["Inter"],
+                      "headline-sm": ["Plus Jakarta Sans"],
+                      "display-lg": ["Plus Jakarta Sans"],
+                      "headline-lg": ["Plus Jakarta Sans"],
+                      "headline-md": ["Plus Jakarta Sans"],
+                      "headline-lg-mobile": ["Plus Jakarta Sans"]
+              },
+              "fontSize": {
+                      "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                      "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                      "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                      "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                      "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                      "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                      "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                      "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                      "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                      "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}]
+              }
+            },
+          },
+        }
+      </script>
+</head>
+<body class="bg-surface-bg text-on-surface">
+<!-- SideNavBar Anchor -->
+<aside class="w-[280px] h-full fixed left-0 top-0 bg-surface-container-lowest border-r border-border-subtle flex flex-col p-gutter z-50">
+<div class="mb-10">
+<h1 class="font-headline-md text-headline-md font-bold text-primary">SiSeminar</h1>
+<p class="text-on-surface-variant font-label-sm text-label-sm">Admin Portal</p>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-xl group" href="#">
+<span class="material-symbols-outlined text-outline" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<!-- Active State for Events Management -->
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl font-bold" href="#">
+<span class="material-symbols-outlined sidebar-active" data-icon="event" style="font-variation-settings: 'FILL' 1;">event</span>
+<span class="font-label-md text-label-md">Events</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-xl group" href="#">
+<span class="material-symbols-outlined text-outline" data-icon="handyman">handyman</span>
+<span class="font-label-md text-label-md">Form Builder</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-xl group" href="#">
+<span class="material-symbols-outlined text-outline" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-gutter border-t border-border-subtle flex items-center gap-3">
+<img alt="SiSeminar Admin Avatar" class="w-10 h-10 rounded-full border border-border-subtle" data-alt="A professional headshot of a corporate administrator in a high-key, modern office setting. The lighting is soft and professional, highlighting a friendly yet authoritative expression. The background consists of a blurred, minimalist architectural space with teal and deep blue accents reflecting the corporate brand identity." src="https://lh3.googleusercontent.com/aida/AP1WRLvNV5-JMyA3gR4gLgjOIExz0gV-1Hp4A_g82g-c3_faT-HmaQJCvAZGz3iBWNyv12d0KVjMNprAhDEJrduBKGapsEOU3tneTEmtRkowD43nMLtzFRqwUluXwP5h8O_e8W-VR5rGYT6-F1nT0UXshqgbPUHKYxFS6IROrt5TZB_ntAsvQJzMrW9nCOrm0eB4YUS7fK5OHiBMfxHY-69VGmGUJ-kTEFWbTsLE9RVH4YctUn6Ld_kYsRMY-cA"/>
+<div class="overflow-hidden">
+<p class="font-label-md text-label-md text-on-surface truncate">Alex Rivera</p>
+<p class="text-[12px] text-on-surface-variant truncate">Lead Coordinator</p>
+</div>
+</div>
+</aside>
+<!-- TopNavBar Anchor -->
+<header class="fixed top-0 right-0 left-0 ml-[280px] h-16 bg-surface-container-lowest border-b border-border-subtle flex justify-between items-center px-margin-desktop z-40">
+<div class="flex items-center w-1/3">
+<div class="relative w-full max-w-sm">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-outline" data-icon="search">search</span>
+<input class="w-full pl-10 pr-4 py-2 bg-surface-container-low border-none rounded-full text-body-sm font-body-sm focus:ring-2 focus:ring-primary-container transition-all" placeholder="Search events or organizers..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-4">
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low rounded-full transition-transform active:scale-90">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="w-10 h-10 flex items-center justify-center text-on-surface-variant hover:bg-surface-container-low rounded-full transition-transform active:scale-90">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="h-8 w-px bg-border-subtle mx-2"></div>
+<img alt="User Profile" class="w-8 h-8 rounded-full cursor-pointer border border-border-subtle" data-alt="Close up of a professional male administrator in his 30s with a clean and polished look. The lighting is cinematic yet bright, fitting for a modern high-end web application. The overall aesthetic is clean and efficient, with a palette of whites, teals, and deep blues." src="https://lh3.googleusercontent.com/aida/AP1WRLtHHdhtRmgzJAIooa_S1XkCa0qdSpgYs-DDaGXhle0CNHF0uEYLrOgE6EnJ6BkoLTisE02JiChD89doianG8R-IF1iP1tII6HNL3ohLJFfllCmxZ2tLDrb6aIsG-Jc75SPWSInLzI2M60qS30n9YrGDklX4Bbsq1soIyjrd7CIe3MmEP666143xHpXq1kNmZ7O7LCQNAO7178T4OzKwgXCFw5lPdMpDC0iUzOeEE8MFP3AsLQH1dUTujyY"/>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] pt-16 min-h-screen pb-20">
+<div class="max-w-container-max mx-auto px-margin-desktop py-gutter">
+<!-- Page Header -->
+<div class="flex justify-between items-end mb-10">
+<div>
+<nav class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant mb-2">
+<span>Management</span>
+<span class="material-symbols-outlined text-[14px]" data-icon="chevron_right">chevron_right</span>
+<span class="text-primary font-bold">Events</span>
+</nav>
+<h2 class="font-headline-lg text-headline-lg text-on-surface">Event Management</h2>
+<p class="text-on-surface-variant font-body-md text-body-md mt-1">Organize, track, and manage all your active and upcoming seminars.</p>
+</div>
+<button class="bg-teal-accent hover:bg-secondary text-white px-6 py-3 rounded-xl font-bold flex items-center gap-2 transition-all shadow-sm hover:shadow-md active:scale-95">
+<span class="material-symbols-outlined" data-icon="add">add</span>
+                    Create New Event
+                </button>
+</div>
+<!-- Dashboard Stats Summary (Atmospheric Micro-interaction) -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-gutter mb-10">
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-border-subtle">
+<div class="flex items-center justify-between mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Active Seminars</span>
+<div class="w-8 h-8 bg-primary-container/10 rounded-lg flex items-center justify-center text-primary">
+<span class="material-symbols-outlined" data-icon="calendar_today">calendar_today</span>
+</div>
+</div>
+<div class="text-headline-md font-headline-md text-on-surface">12</div>
+<div class="mt-2 text-success-green font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_up">trending_up</span>
+                        +2 from last month
+                    </div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-border-subtle">
+<div class="flex items-center justify-between mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Total Participants</span>
+<div class="w-8 h-8 bg-secondary-container/20 rounded-lg flex items-center justify-center text-secondary">
+<span class="material-symbols-outlined" data-icon="groups">groups</span>
+</div>
+</div>
+<div class="text-headline-md font-headline-md text-on-surface">2,840</div>
+<div class="mt-2 text-success-green font-label-sm text-label-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="trending_up">trending_up</span>
+                        15% increase
+                    </div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-border-subtle">
+<div class="flex items-center justify-between mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Avg. Engagement</span>
+<div class="w-8 h-8 bg-tertiary-fixed/30 rounded-lg flex items-center justify-center text-tertiary">
+<span class="material-symbols-outlined" data-icon="bar_chart">bar_chart</span>
+</div>
+</div>
+<div class="text-headline-md font-headline-md text-on-surface">94%</div>
+<div class="mt-2 text-on-surface-variant font-label-sm text-label-sm">High satisfaction rating</div>
+</div>
+<div class="bg-surface-container-lowest p-6 rounded-xl border border-border-subtle">
+<div class="flex items-center justify-between mb-4">
+<span class="text-on-surface-variant font-label-md text-label-md uppercase tracking-wider">Upcoming Revenue</span>
+<div class="w-8 h-8 bg-success-green/10 rounded-lg flex items-center justify-center text-success-green">
+<span class="material-symbols-outlined" data-icon="payments">payments</span>
+</div>
+</div>
+<div class="text-headline-md font-headline-md text-on-surface">$45.2k</div>
+<div class="mt-2 text-on-surface-variant font-label-sm text-label-sm">Projected Q3</div>
+</div>
+</div>
+<!-- Filters Bar -->
+<div class="flex items-center justify-between mb-6">
+<div class="flex items-center gap-3">
+<button class="bg-primary text-white font-label-md text-label-md px-4 py-2 rounded-lg flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="filter_list">filter_list</span>
+                        Filters
+                    </button>
+<div class="flex gap-2">
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-label-sm font-label-sm text-on-surface flex items-center gap-2">
+                            Active
+                            <span class="material-symbols-outlined text-[14px] cursor-pointer" data-icon="close">close</span>
+</span>
+<span class="bg-surface-container-high px-3 py-1 rounded-full text-label-sm font-label-sm text-on-surface flex items-center gap-2">
+                            Hybrid
+                            <span class="material-symbols-outlined text-[14px] cursor-pointer" data-icon="close">close</span>
+</span>
+</div>
+</div>
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant">
+<span>Sort by:</span>
+<select class="bg-transparent border-none focus:ring-0 text-primary font-bold py-0 pr-8">
+<option>Upcoming Date</option>
+<option>Most Popular</option>
+<option>Name A-Z</option>
+</select>
+</div>
+</div>
+<!-- Bento Grid of Events -->
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8">
+<!-- Event Card 1 -->
+<article class="group bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden hover:border-teal-accent transition-all hover:shadow-xl hover:-translate-y-1">
+<div class="aspect-video relative overflow-hidden">
+<img alt="Global Fintech Summit" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A wide angle photograph of a modern tech conference hall. The stage is illuminated with sophisticated teal and blue stage lights. The audience is visible as blurred silhouettes in the foreground, focusing attention on a high-definition large screen displaying complex financial data visualizations. The atmosphere is professional, energetic, and highly advanced." src="https://lh3.googleusercontent.com/aida/AP1WRLsOMq_Wi_-xWShXDqbahGXkGuUb7Bzsza_CftXHUGaLtuvXgvLYZlt1Do6QasHdWwASTi1pZWmgjttuPe-iELXbO6lrSFld3pVmGbAcgrEuiKwch1sp9He-s5As3O2NSJVb8EFZjAMaC5CM2cPHD0b3ElftPNxCjfChbCaezWUs8vhrF952pFykcx0naHyO2HSfboV-DPq3Uk_wL0-ZYQ__xkr5e9mJkxIPeWI2OeBtE5VQAYQclxMF_nI"/>
+<div class="absolute top-4 left-4">
+<span class="bg-success-green/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tight">Active</span>
+</div>
+<div class="absolute bottom-4 right-4">
+<span class="bg-white/90 backdrop-blur-md text-primary font-bold px-3 py-1 rounded-lg text-label-sm shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="groups">groups</span>
+                                450 Registered
+                            </span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_today">calendar_today</span>
+                            Oct 24 - 26, 2024
+                        </div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 group-hover:text-primary transition-colors">Global Fintech Summit: Next Gen Banking</h3>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant mb-6">
+<span class="material-symbols-outlined text-[18px] text-teal-accent" data-icon="location_on">location_on</span>
+                            London Convention Centre, UK
+                        </div>
+<div class="flex items-center justify-between pt-4 border-t border-border-subtle">
+<div class="flex gap-2">
+<button class="w-9 h-9 flex items-center justify-center border border-border-subtle rounded-lg text-on-surface-variant hover:bg-primary-container hover:text-white hover:border-primary-container transition-all" title="Edit Event">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center border border-border-subtle rounded-lg text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container hover:border-secondary-container transition-all" title="View Groups">
+<span class="material-symbols-outlined text-[20px]" data-icon="diversity_3">diversity_3</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center border border-border-subtle rounded-lg text-on-surface-variant hover:bg-tertiary-fixed/40 hover:text-tertiary transition-all" title="Broadcast Message">
+<span class="material-symbols-outlined text-[20px]" data-icon="campaign">campaign</span>
+</button>
+</div>
+<button class="text-primary font-bold font-label-md text-label-md flex items-center gap-1 hover:underline">
+                                Details <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Event Card 2 -->
+<article class="group bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden hover:border-teal-accent transition-all hover:shadow-xl hover:-translate-y-1">
+<div class="aspect-video relative overflow-hidden">
+<img alt="Cyber Security Workshop" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A cinematic photo of a professional workshop setup. Multiple sleek laptops are arranged on clean wooden desks in a bright, modern studio. In the background, a white board is filled with flowcharts and technical diagrams. The lighting is crisp and natural, emphasizing a productive, high-end educational environment. The color palette features whites, light grays, and corporate blue accents." src="https://lh3.googleusercontent.com/aida/AP1WRLvrxEyfzQTGuAiTCAkEBIL93P_ijDfmUQbSucvyQkbG0IyCQTNx71Fs8RBDNSk3ppwI8zP7DFDvTDPx-tvytb84kaasOMjEDosfPTl3TYz4lWXSB8VsAa32rxXbKuFSO9qDhudcvIYC1CRSjrPtZND5AfEdFuM7lHR2CNO7Vc-snJFyZadX4ji11BkeyQQVEMzyL-LSOnATSz0-RpzF8qE6erbxVZm2ADKVJee0oWrjSffUzmTf4WEn8tE"/>
+<div class="absolute top-4 left-4">
+<span class="bg-primary/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tight">Draft</span>
+</div>
+<div class="absolute bottom-4 right-4">
+<span class="bg-white/90 backdrop-blur-md text-primary font-bold px-3 py-1 rounded-lg text-label-sm shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="groups">groups</span>
+                                12 Reserved
+                            </span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_today">calendar_today</span>
+                            Nov 12, 2024
+                        </div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 group-hover:text-primary transition-colors">Advanced Cyber Security Hands-on Workshop</h3>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant mb-6">
+<span class="material-symbols-outlined text-[18px] text-teal-accent" data-icon="location_on">location_on</span>
+                            TechHub Tokyo, Japan
+                        </div>
+<div class="flex items-center justify-between pt-4 border-t border-border-subtle">
+<div class="flex gap-2">
+<button class="w-9 h-9 flex items-center justify-center border border-border-subtle rounded-lg text-on-surface-variant hover:bg-primary-container hover:text-white hover:border-primary-container transition-all" title="Edit Event">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center border border-border-subtle rounded-lg text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container hover:border-secondary-container transition-all" title="View Groups">
+<span class="material-symbols-outlined text-[20px]" data-icon="diversity_3">diversity_3</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center border border-border-subtle rounded-lg text-on-surface-variant hover:bg-tertiary-fixed/40 hover:text-tertiary transition-all" title="Broadcast Message">
+<span class="material-symbols-outlined text-[20px]" data-icon="campaign">campaign</span>
+</button>
+</div>
+<button class="text-primary font-bold font-label-md text-label-md flex items-center gap-1 hover:underline">
+                                Details <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+<!-- Event Card 3 -->
+<article class="group bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden hover:border-teal-accent transition-all hover:shadow-xl hover:-translate-y-1">
+<div class="aspect-video relative overflow-hidden">
+<img alt="Sustainable Energy Forum" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" data-alt="A breathtaking view of a modern skyscraper's atrium, filled with lush indoor vertical gardens and clean architectural lines. Natural sunlight streams through high glass ceilings, creating a bright and inspiring atmosphere. The image represents sustainability and forward-thinking corporate culture, using a palette of vibrant greens, crisp whites, and natural textures." src="https://lh3.googleusercontent.com/aida/AP1WRLsYNkkTtO_sZe2jGu2ls_l0jY4xaeEfQeEUGbyglsA4DeCgGahzTX4V3MkTBBD-NcrV5vVPtd1iO-LckFQ7z_rXLyySI238wxTukr-azqQITHZAlfE0L5hyIS05IZrdCuszf-Tscts13h8bGjQnp0UCkI-TNkVBF_etJ7SIFEBJ7EB9qbLTVS3V2po31xcJHNuPBP6-usbFTuw124yyHfrgpLmfuWvfHdrwbQmzOndLiGjaYVI23Rk_mG8"/>
+<div class="absolute top-4 left-4">
+<span class="bg-destructive-red/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-[12px] font-bold uppercase tracking-tight">Full</span>
+</div>
+<div class="absolute bottom-4 right-4">
+<span class="bg-white/90 backdrop-blur-md text-primary font-bold px-3 py-1 rounded-lg text-label-sm shadow-sm flex items-center gap-1">
+<span class="material-symbols-outlined text-[16px]" data-icon="groups">groups</span>
+                                1,200 Registered
+                            </span>
+</div>
+</div>
+<div class="p-6">
+<div class="flex items-center gap-2 text-label-sm font-label-sm text-on-surface-variant mb-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="calendar_today">calendar_today</span>
+                            Dec 05 - 07, 2024
+                        </div>
+<h3 class="font-headline-sm text-headline-sm text-on-surface mb-2 group-hover:text-primary transition-colors">Global Forum for Sustainable Energy 2024</h3>
+<div class="flex items-center gap-2 text-body-sm font-body-sm text-on-surface-variant mb-6">
+<span class="material-symbols-outlined text-[18px] text-teal-accent" data-icon="location_on">location_on</span>
+                            Nordic Hall, Stockholm
+                        </div>
+<div class="flex items-center justify-between pt-4 border-t border-border-subtle">
+<div class="flex gap-2">
+<button class="w-9 h-9 flex items-center justify-center border border-border-subtle rounded-lg text-on-surface-variant hover:bg-primary-container hover:text-white hover:border-primary-container transition-all" title="Edit Event">
+<span class="material-symbols-outlined text-[20px]" data-icon="edit">edit</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center border border-border-subtle rounded-lg text-on-surface-variant hover:bg-secondary-container hover:text-on-secondary-container hover:border-secondary-container transition-all" title="View Groups">
+<span class="material-symbols-outlined text-[20px]" data-icon="diversity_3">diversity_3</span>
+</button>
+<button class="w-9 h-9 flex items-center justify-center border border-border-subtle rounded-lg text-on-surface-variant hover:bg-tertiary-fixed/40 hover:text-tertiary transition-all" title="Broadcast Message">
+<span class="material-symbols-outlined text-[20px]" data-icon="campaign">campaign</span>
+</button>
+</div>
+<button class="text-primary font-bold font-label-md text-label-md flex items-center gap-1 hover:underline">
+                                Details <span class="material-symbols-outlined text-[18px]" data-icon="arrow_forward">arrow_forward</span>
+</button>
+</div>
+</div>
+</article>
+</div>
+<!-- Pagination or Load More -->
+<div class="mt-12 flex flex-col items-center gap-4">
+<button class="px-8 py-3 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all active:scale-95">
+                    Load More Events
+                </button>
+<p class="text-on-surface-variant text-label-sm font-label-sm">Showing 3 of 12 active events</p>
+</div>
+</div>
+</main>
+<!-- Footer Anchor -->
+<footer class="ml-[280px] bg-surface-container-low border-t border-border-subtle">
+<div class="max-w-container-max mx-auto px-margin-desktop py-8 flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-4">
+<span class="font-label-md text-label-md font-bold text-primary">SiSeminar</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm opacity-80">© 2024 SiSeminar Management System. All rights reserved.</span>
+</div>
+<div class="flex items-center gap-6">
+<a class="text-on-surface-variant hover:text-secondary font-body-sm text-body-sm transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="text-on-surface-variant hover:text-secondary font-body-sm text-body-sm transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="text-on-surface-variant hover:text-secondary font-body-sm text-body-sm transition-colors opacity-80 hover:opacity-100" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for the search bar
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('scale-[1.02]');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('scale-[1.02]');
+        });
+
+        // Hover effect for stat cards
+        document.querySelectorAll('.bg-surface-container-lowest').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.classList.add('shadow-md');
+            });
+            card.addEventListener('mouseleave', () => {
+                card.classList.remove('shadow-md');
+            });
+        });
+    </script>
+</body></html>

@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Form Builder - SiSeminar Admin Portal</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            "colors": {
+                    "border-subtle": "#E2E8F0",
+                    "success-green": "#10B981",
+                    "outline": "#757682",
+                    "inverse-on-surface": "#eaf1ff",
+                    "tertiary-container": "#5c3800",
+                    "inverse-surface": "#213145",
+                    "background": "#f8f9ff",
+                    "tertiary-fixed": "#ffddb8",
+                    "on-surface-variant": "#444651",
+                    "tertiary-fixed-dim": "#ffb95f",
+                    "on-secondary-container": "#006f66",
+                    "secondary-fixed": "#89f5e7",
+                    "admin-blue-dark": "#172554",
+                    "outline-variant": "#c5c5d3",
+                    "on-tertiary-fixed-variant": "#653e00",
+                    "on-primary-container": "#90a8ff",
+                    "destructive-red": "#EF4444",
+                    "on-error": "#ffffff",
+                    "on-tertiary-container": "#ef9900",
+                    "error": "#ba1a1a",
+                    "on-tertiary-fixed": "#2a1700",
+                    "on-error-container": "#93000a",
+                    "on-primary-fixed": "#00164e",
+                    "primary-fixed-dim": "#b6c4ff",
+                    "surface-container": "#e5eeff",
+                    "inverse-primary": "#b6c4ff",
+                    "primary": "#00236f",
+                    "on-surface": "#0b1c30",
+                    "secondary-fixed-dim": "#6bd8cb",
+                    "secondary": "#006a61",
+                    "surface-container-lowest": "#ffffff",
+                    "secondary-container": "#86f2e4",
+                    "surface-container-high": "#dce9ff",
+                    "surface-container-low": "#eff4ff",
+                    "surface-tint": "#4059aa",
+                    "surface-bg": "#F8FAFC",
+                    "surface": "#f8f9ff",
+                    "on-primary-fixed-variant": "#264191",
+                    "on-background": "#0b1c30",
+                    "tertiary": "#3e2400",
+                    "on-secondary-fixed-variant": "#005049",
+                    "on-secondary": "#ffffff",
+                    "surface-container-highest": "#d3e4fe",
+                    "on-tertiary": "#ffffff",
+                    "surface-bright": "#f8f9ff",
+                    "surface-variant": "#d3e4fe",
+                    "primary-container": "#1e3a8a",
+                    "on-primary": "#ffffff",
+                    "teal-accent": "#14B8A6"
+            },
+            "borderRadius": {
+                    "DEFAULT": "0.125rem",
+                    "lg": "0.25rem",
+                    "xl": "0.5rem",
+                    "full": "0.75rem"
+            },
+            "spacing": {
+                    "base": "4px",
+                    "gutter": "24px",
+                    "margin-desktop": "40px",
+                    "margin-mobile": "16px",
+                    "container-max": "1280px"
+            },
+            "fontFamily": {
+                    "label-md": ["Inter"],
+                    "body-sm": ["Inter"],
+                    "label-sm": ["Inter"],
+                    "body-md": ["Inter"],
+                    "body-lg": ["Inter"],
+                    "headline-sm": ["Plus Jakarta Sans"],
+                    "display-lg": ["Plus Jakarta Sans"],
+                    "headline-lg": ["Plus Jakarta Sans"],
+                    "headline-md": ["Plus Jakarta Sans"],
+                    "headline-lg-mobile": ["Plus Jakarta Sans"]
+            },
+            "fontSize": {
+                    "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                    "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                    "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                    "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                    "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                    "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                    "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                    "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                    "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                    "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}]
+            }
+          },
+        },
+      }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .preview-scroll::-webkit-scrollbar {
+            width: 4px;
+        }
+        .preview-scroll::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        .preview-scroll::-webkit-scrollbar-thumb {
+            background: #E2E8F0;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="bg-surface-bg text-on-surface selection:bg-teal-accent selection:text-white">
+<!-- SideNavBar Anchor -->
+<aside class="w-[280px] h-full fixed left-0 top-0 bg-surface-container-lowest border-r border-border-subtle flex flex-col p-gutter z-50">
+<div class="mb-10 flex items-center gap-3">
+<div class="w-10 h-10 bg-primary rounded-xl flex items-center justify-center text-white">
+<span class="material-symbols-outlined">analytics</span>
+</div>
+<div>
+<h1 class="font-headline-md text-headline-md font-bold text-primary">SiSeminar</h1>
+<p class="font-label-sm text-label-sm text-on-surface-variant opacity-70">Admin Portal</p>
+</div>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-xl font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+                Dashboard
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-xl font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+                Events
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl font-bold font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="handyman">handyman</span>
+                Form Builder
+            </a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-colors rounded-xl font-label-md text-label-md" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+                Settings
+            </a>
+</nav>
+<div class="mt-auto pt-8 border-t border-border-subtle">
+<div class="flex items-center gap-3 px-2">
+<img alt="SiSeminar Admin Avatar" class="w-10 h-10 rounded-full bg-surface-container-high object-cover" data-alt="A professional headshot of a modern corporate administrator in a bright, high-key office environment. The lighting is soft and natural, emphasizing a trustworthy and efficient personality. The background is a minimalist, slightly blurred workspace with clean lines and a hint of a teal and navy blue color scheme, reflecting the brand identity." src="https://lh3.googleusercontent.com/aida/AP1WRLsEgFd3KKqG4Cqbi3BrRdkTxE-l080-Forr-5XqRyJHBLuuh1eru-3d5BBtZWnWhzzB_P-Pz2QxkVKGBTS6ba56ThlvJpH7vpr5YYaLdScPQDGYevHJVq1khwtSdP_gmew9cvvhkG-WjK0u2dtJ3P_hNmwHF3a2XQ9Paa_REr6U5XYrGDtpsWDj2WC7LwDGeBakqv2U9FUhjzzCQ6bo8BjfVev-MhkDAsZMdgvbc2d3Wlisqa-9I-cnk4I"/>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Alex Rivera</p>
+<p class="font-label-sm text-label-sm text-on-surface-variant">Chief Administrator</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- Main Content Area -->
+<div class="ml-[280px]">
+<!-- TopNavBar Anchor -->
+<header class="flex justify-between items-center h-16 px-margin-desktop bg-surface-container-lowest border-b border-border-subtle sticky top-0 z-40">
+<div class="flex items-center gap-4 w-1/3">
+<div class="relative w-full max-w-md">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant" data-icon="search">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full pl-10 pr-4 py-2 text-body-sm font-body-sm focus:ring-2 focus:ring-primary transition-all" placeholder="Search forms or templates..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<button class="text-on-surface-variant hover:text-primary transition-transform active:scale-90">
+<span class="material-symbols-outlined" data-icon="notifications">notifications</span>
+</button>
+<button class="text-on-surface-variant hover:text-primary transition-transform active:scale-90">
+<span class="material-symbols-outlined" data-icon="help">help</span>
+</button>
+<div class="h-8 w-[1px] bg-border-subtle mx-2"></div>
+<button class="bg-primary text-white px-6 py-2 rounded-xl font-label-md text-label-md flex items-center gap-2 hover:bg-admin-blue-dark transition-all">
+<span class="material-symbols-outlined text-[18px]" data-icon="publish">publish</span>
+                    Publish Changes
+                </button>
+</div>
+</header>
+<main class="p-margin-desktop">
+<!-- Header Section -->
+<div class="mb-8 flex justify-between items-end">
+<div>
+<h2 class="font-headline-lg text-headline-lg text-primary mb-2">Registration Form Builder</h2>
+<p class="font-body-md text-body-md text-on-surface-variant max-w-2xl">Design a custom registration flow for the "National Pediatric Summit 2024". Drag and drop fields to reorder or use the workspace to add new custom attributes.</p>
+</div>
+<div class="flex gap-3">
+<button class="px-4 py-2 text-primary border border-primary rounded-xl font-label-md text-label-md hover:bg-surface-container-low transition-colors">
+                        Save Draft
+                    </button>
+<button class="px-4 py-2 bg-secondary text-white rounded-xl font-label-md text-label-md hover:bg-on-secondary-container transition-colors flex items-center gap-2">
+<span class="material-symbols-outlined text-[18px]" data-icon="visibility">visibility</span>
+                        Live Preview
+                    </button>
+</div>
+</div>
+<!-- Workspace Grid -->
+<div class="grid grid-cols-12 gap-gutter">
+<!-- Left: Field Library & Builder -->
+<div class="col-span-7 space-y-6">
+<!-- Field Controls -->
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl p-6">
+<h3 class="font-label-md text-label-md text-on-surface uppercase tracking-wider mb-4">Add New Field</h3>
+<div class="grid grid-cols-4 gap-4">
+<button class="flex flex-col items-center justify-center gap-2 p-4 border border-dashed border-outline-variant rounded-xl hover:border-teal-accent hover:bg-surface-container-low transition-all group">
+<span class="material-symbols-outlined text-outline group-hover:text-teal-accent" data-icon="text_fields">text_fields</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Text</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-4 border border-dashed border-outline-variant rounded-xl hover:border-teal-accent hover:bg-surface-container-low transition-all group">
+<span class="material-symbols-outlined text-outline group-hover:text-teal-accent" data-icon="pin">pin</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Number</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-4 border border-dashed border-outline-variant rounded-xl hover:border-teal-accent hover:bg-surface-container-low transition-all group">
+<span class="material-symbols-outlined text-outline group-hover:text-teal-accent" data-icon="arrow_drop_down_circle">arrow_drop_down_circle</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Dropdown</span>
+</button>
+<button class="flex flex-col items-center justify-center gap-2 p-4 border border-dashed border-outline-variant rounded-xl hover:border-teal-accent hover:bg-surface-container-low transition-all group">
+<span class="material-symbols-outlined text-outline group-hover:text-teal-accent" data-icon="check_box">check_box</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Checkbox</span>
+</button>
+</div>
+</div>
+<!-- Builder Canvas -->
+<div class="space-y-4">
+<div class="flex items-center justify-between">
+<h3 class="font-headline-sm text-headline-sm text-primary">Form Structure</h3>
+<span class="font-label-sm text-label-sm text-on-surface-variant bg-surface-container-high px-3 py-1 rounded-full">3 Fields Configured</span>
+</div>
+<!-- Fixed Field: Name -->
+<div class="group bg-surface-container-lowest border border-border-subtle rounded-xl p-5 flex items-start gap-4 hover:border-primary transition-all relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="mt-1 cursor-grab active:cursor-grabbing text-outline-variant">
+<span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex-grow grid grid-cols-2 gap-4">
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant block mb-1">Field Label</label>
+<input class="w-full border-border-subtle rounded-lg font-body-sm text-body-sm h-10 focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="Full Name"/>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant block mb-1">Type</label>
+<div class="h-10 px-3 bg-surface-container-low rounded-lg flex items-center font-body-sm text-body-sm text-on-surface">
+                                        Short Text (Required)
+                                    </div>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<button class="p-2 text-outline-variant hover:text-destructive-red transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Fixed Field: WhatsApp -->
+<div class="group bg-surface-container-lowest border border-border-subtle rounded-xl p-5 flex items-start gap-4 hover:border-primary transition-all relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="mt-1 cursor-grab active:cursor-grabbing text-outline-variant">
+<span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex-grow grid grid-cols-2 gap-4">
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant block mb-1">Field Label</label>
+<input class="w-full border-border-subtle rounded-lg font-body-sm text-body-sm h-10 focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="WhatsApp Number"/>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant block mb-1">Type</label>
+<div class="h-10 px-3 bg-surface-container-low rounded-lg flex items-center font-body-sm text-body-sm text-on-surface">
+                                        Number (Required)
+                                    </div>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<button class="p-2 text-outline-variant hover:text-destructive-red transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Fixed Field: Anakku.id Clause -->
+<div class="group bg-surface-container-lowest border border-border-subtle rounded-xl p-5 flex items-start gap-4 hover:border-primary transition-all relative overflow-hidden">
+<div class="absolute left-0 top-0 bottom-0 w-1 bg-primary"></div>
+<div class="mt-1 cursor-grab active:cursor-grabbing text-outline-variant">
+<span class="material-symbols-outlined" data-icon="drag_indicator">drag_indicator</span>
+</div>
+<div class="flex-grow">
+<div class="mb-4">
+<label class="font-label-md text-label-md text-on-surface-variant block mb-1">Consent Clause Title</label>
+<input class="w-full border-border-subtle rounded-lg font-body-sm text-body-sm h-10 focus:border-primary focus:ring-1 focus:ring-primary" type="text" value="Anakku.id Terms &amp; Data Privacy"/>
+</div>
+<div>
+<label class="font-label-md text-label-md text-on-surface-variant block mb-1">Clause Description</label>
+<textarea class="w-full border-border-subtle rounded-lg font-body-sm text-body-sm p-3 focus:border-primary focus:ring-1 focus:ring-primary" rows="2">I agree to the processing of my personal data for event management purposes by Anakku.id.</textarea>
+</div>
+</div>
+<div class="flex items-center gap-2 mt-1">
+<button class="p-2 text-outline-variant hover:text-destructive-red transition-colors">
+<span class="material-symbols-outlined" data-icon="delete">delete</span>
+</button>
+</div>
+</div>
+<!-- Empty Dropzone -->
+<div class="border-2 border-dashed border-outline-variant rounded-xl py-8 flex flex-col items-center justify-center text-on-surface-variant opacity-60 hover:opacity-100 hover:bg-surface-container-low hover:border-primary transition-all cursor-pointer">
+<span class="material-symbols-outlined text-4xl mb-2" data-icon="add_circle">add_circle</span>
+<p class="font-label-md text-label-md">Click to add more fields</p>
+</div>
+</div>
+</div>
+<!-- Right: Preview Pane -->
+<div class="col-span-5">
+<div class="sticky top-24 bg-white border border-border-subtle rounded-2xl shadow-sm overflow-hidden flex flex-col h-[700px]">
+<div class="bg-primary p-6 text-white">
+<div class="flex items-center gap-2 mb-2">
+<span class="material-symbols-outlined" data-icon="devices">devices</span>
+<span class="font-label-sm text-label-sm uppercase tracking-widest opacity-80">Participant View Preview</span>
+</div>
+<h4 class="font-headline-sm text-headline-sm">Seminar Registration</h4>
+</div>
+<div class="p-8 flex-grow overflow-y-auto preview-scroll bg-surface-container-lowest">
+<div class="space-y-6">
+<!-- Banner Image Placeholder -->
+<div class="w-full h-40 bg-surface-container-high rounded-xl overflow-hidden relative group">
+<img alt="Event Banner" class="w-full h-full object-cover" data-alt="A clean and professional digital banner for a high-end medical seminar. The visual style is minimalist and corporate, featuring soft gradients of teal and navy blue. Subtle abstract geometric shapes suggest connectivity and growth. The overall mood is sophisticated and authoritative, perfectly suited for a pediatric summit audience." src="https://lh3.googleusercontent.com/aida/AP1WRLtPco7Mbhu7viMx-zpiZG3Doz8L-dI_4aD-usp3QzwN5_4yK2OGSIPGSDspyEx3_2idSsEySxXpTCr5pEWiTU5xObA6_mSHfnySirAC0GDZ9aQeVpB1m9A4uToOjw_4vPd2b0xJzvUmtyfl3xXW2fqZ0jWGy0zloXKlm566rq__dhshD_b7MyjWAOIYyOUarx32vEZqjk48ImPJ-mnUytf4_jjiHkoLidJ3TN8IkYR4XWPpgVQ-reTm-FE"/>
+<div class="absolute inset-0 flex items-center justify-center bg-black/20 opacity-0 group-hover:opacity-100 transition-opacity">
+<button class="bg-white/90 px-4 py-2 rounded-full text-primary font-label-md text-label-md">Change Banner</button>
+</div>
+</div>
+<!-- Preview Field: Name -->
+<div>
+<label class="font-label-md text-label-md text-on-surface block mb-2">Full Name <span class="text-error">*</span></label>
+<input class="w-full border-border-subtle rounded-lg font-body-sm text-body-sm h-10 bg-white" disabled="" placeholder="e.g. Dr. Jane Smith" type="text"/>
+</div>
+<!-- Preview Field: WhatsApp -->
+<div>
+<label class="font-label-md text-label-md text-on-surface block mb-2">WhatsApp Number <span class="text-error">*</span></label>
+<div class="relative">
+<div class="absolute left-3 top-1/2 -translate-y-1/2 font-body-sm text-on-surface-variant border-r border-border-subtle pr-2">+62</div>
+<input class="w-full border-border-subtle rounded-lg font-body-sm text-body-sm h-10 pl-16 bg-white" disabled="" placeholder="812-3456-7890" type="text"/>
+</div>
+</div>
+<!-- Preview Field: Consent -->
+<div class="flex items-start gap-4 p-4 bg-surface-container-low rounded-xl border border-border-subtle">
+<input class="w-6 h-6 rounded border-border-subtle text-teal-accent focus:ring-teal-accent mt-1" disabled="" type="checkbox"/>
+<div class="text-body-sm font-body-sm text-on-surface">
+<span class="font-bold block mb-1">Anakku.id Terms &amp; Data Privacy</span>
+                                        I agree to the processing of my personal data for event management purposes by Anakku.id. <a class="text-teal-accent underline" href="#">Read full policy.</a>
+</div>
+</div>
+<button class="w-full py-4 bg-primary text-white rounded-xl font-headline-sm text-headline-sm shadow-md opacity-50 cursor-not-allowed">
+                                    Register Now
+                                </button>
+<p class="text-center font-body-sm text-body-sm text-on-surface-variant opacity-60">
+                                    Already registered? <a class="text-primary font-semibold" href="#">Check Status</a>
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Footer Anchor -->
+<footer class="bg-surface-container-low border-t border-border-subtle py-8 mt-12">
+<div class="max-w-container-max mx-auto px-margin-desktop flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md font-bold text-primary">SiSeminar</span>
+<span class="text-on-surface-variant font-body-sm text-body-sm">| Form Builder v2.4</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant">© 2024 SiSeminar Management System. All rights reserved.</p>
+<div class="flex gap-6">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</div>
+<!-- Micro-interactions Script -->
+<script>
+        // Subtle hover effects for field cards
+        document.querySelectorAll('.group.bg-surface-container-lowest').forEach(card => {
+            card.addEventListener('mouseenter', () => {
+                card.style.transform = 'translateY(-2px)';
+                card.style.boxShadow = '0 10px 15px -3px rgba(0, 0, 0, 0.05)';
+            });
+            card.addEventListener('mouseleave', () => {
+                card.style.transform = 'translateY(0)';
+                card.style.boxShadow = 'none';
+            });
+        });
+
+        // Search bar focus effect
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput?.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput?.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    </script>
+</body></html>

@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+
+<html lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Seminar Registration | SiSeminar</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "border-subtle": "#E2E8F0",
+                        "success-green": "#10B981",
+                        "outline": "#757682",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary-container": "#5c3800",
+                        "inverse-surface": "#213145",
+                        "background": "#f8f9ff",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-surface-variant": "#444651",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-secondary-container": "#006f66",
+                        "secondary-fixed": "#89f5e7",
+                        "admin-blue-dark": "#172554",
+                        "outline-variant": "#c5c5d3",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-primary-container": "#90a8ff",
+                        "destructive-red": "#EF4444",
+                        "on-secondary-fixed": "#00201d",
+                        "surface-dim": "#cbdbf5",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#dce1ff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#ef9900",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#00164e",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "surface-container": "#e5eeff",
+                        "inverse-primary": "#b6c4ff",
+                        "primary": "#00236f",
+                        "on-surface": "#0b1c30",
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "secondary": "#006a61",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#86f2e4",
+                        "surface-container-low": "#eff4ff",
+                        "surface-tint": "#4059aa",
+                        "surface-bg": "#F8FAFC",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed-variant": "#264191",
+                        "on-background": "#0b1c30",
+                        "tertiary": "#3e2400",
+                        "on-secondary-fixed-variant": "#005049",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#d3e4fe",
+                        "primary-container": "#1e3a8a",
+                        "on-primary": "#ffffff",
+                        "teal-accent": "#14B8A6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}]
+                    }
+                }
+            }
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        .form-focus-ring:focus {
+            outline: none;
+            border-color: #1E3A8A;
+            box-shadow: 0 0 0 4px rgba(30, 58, 138, 0.1);
+        }
+    </style>
+</head>
+<body class="bg-surface-bg text-on-surface font-body-md min-h-screen flex flex-col">
+<!-- TopNavBar (Simplified for Participant View) -->
+<header class="bg-surface-container-lowest border-b border-border-subtle sticky top-0 z-50">
+<div class="flex justify-between items-center h-16 px-margin-mobile md:px-margin-desktop max-w-container-max mx-auto">
+<div class="font-headline-md text-headline-md font-bold text-primary">SiSeminar</div>
+<div class="flex items-center gap-4">
+<button class="material-symbols-outlined text-on-surface-variant p-2 hover:bg-surface-container-low rounded-full transition-colors" data-icon="help">help</button>
+</div>
+</div>
+</header>
+<main class="flex-grow">
+<!-- Hero Section -->
+<section class="relative w-full overflow-hidden bg-primary-container text-on-primary h-[320px] md:h-[400px] flex items-center justify-center">
+<div class="absolute inset-0 z-0 opacity-40">
+<img alt="" class="w-full h-full object-cover" data-alt="A professional, bright, and modern seminar hall setting with soft teal and deep blue ambient lighting. The atmosphere is high-end and corporate, featuring blurred attendees engaged in a high-tech workshop. The scene is clean, minimalist, and authoritative, with generous whitespace and a sense of efficient learning. The lighting is bright and optimistic, perfectly suited for a light-mode UI design system." src="https://lh3.googleusercontent.com/aida/AP1WRLvUr9CRAqY5OO7_jwTHHc3RWP_DCkXIBYXVlMOvYz8IrEEzujYAFxK0BN1gKBlELGnoZOHZMcKVj-Q27W9-qe3qCA9sVqCrPSl0tD6i_OLNKW6reuq8DqKzxbibtMjQ8T0MDsFbxU3o1oEhkX12WgCZJ-ZxLc-GDAfWzc6JHUGQ_F0S7KBN3W5Dwtdk_ycDAQW2ziKOx8gT9Aqw_qBJ5xpzuvQFkCCZdYEqMH6_t3ouKzI9VuGbo1z3qlk"/>
+</div>
+<div class="relative z-10 text-center px-margin-mobile max-w-3xl">
+<div class="inline-flex items-center gap-2 px-3 py-1 bg-teal-accent text-white rounded-full font-label-sm text-label-sm mb-6 uppercase tracking-wider">
+<span class="material-symbols-outlined text-[14px]" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+                    October 24, 2024
+                </div>
+<h1 class="font-headline-lg-mobile md:font-headline-lg text-headline-lg-mobile md:text-headline-lg mb-4 text-white">Nurturing Tomorrow: Parenting in the Digital Age</h1>
+<p class="font-body-lg text-body-lg text-primary-fixed opacity-90">Join us for an exclusive deep-dive into early childhood development and modern education strategies.</p>
+</div>
+</section>
+<!-- Registration Form Section -->
+<section class="max-w-[768px] mx-auto px-margin-mobile -mt-16 relative z-20 mb-20">
+<div class="bg-surface-container-lowest border border-border-subtle rounded-xl shadow-sm p-8 md:p-12">
+<div class="flex items-center gap-3 mb-8">
+<div class="w-1.5 h-8 bg-teal-accent rounded-full"></div>
+<h2 class="font-headline-md text-headline-md">Participant Registration</h2>
+</div>
+<form class="space-y-8" id="registrationForm">
+<!-- Grid for personal details -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="fullName">Full Name *</label>
+<input class="h-[40px] px-4 rounded-lg border border-border-subtle bg-surface-bg font-body-md form-focus-ring transition-all" id="fullName" name="fullName" placeholder="John Doe" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="whatsapp">WhatsApp Number *</label>
+<input class="h-[40px] px-4 rounded-lg border border-border-subtle bg-surface-bg font-body-md form-focus-ring transition-all" id="whatsapp" name="whatsapp" placeholder="0812xxxxxxx" required="" type="tel"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="yourAge">Your Age *</label>
+<input class="h-[40px] px-4 rounded-lg border border-border-subtle bg-surface-bg font-body-md form-focus-ring transition-all" id="yourAge" name="yourAge" placeholder="Years" required="" type="number"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="childAge">Child's Age *</label>
+<input class="h-[40px] px-4 rounded-lg border border-border-subtle bg-surface-bg font-body-md form-focus-ring transition-all" id="childAge" name="childAge" placeholder="Years" required="" type="number"/>
+</div>
+</div>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="district">District *</label>
+<input class="h-[40px] px-4 rounded-lg border border-border-subtle bg-surface-bg font-body-md form-focus-ring transition-all" id="district" name="district" placeholder="Your location" required="" type="text"/>
+</div>
+<div class="flex flex-col gap-2">
+<label class="font-label-md text-label-md text-on-surface-variant" for="source">How did you hear about us? *</label>
+<select class="h-[40px] px-4 rounded-lg border border-border-subtle bg-surface-bg font-body-md form-focus-ring transition-all appearance-none" id="source" name="source" required="">
+<option disabled="" selected="" value="">Select an option</option>
+<option value="instagram">Instagram</option>
+<option value="facebook">Facebook</option>
+<option value="friends">Friend / Family</option>
+<option value="community">WhatsApp Community</option>
+<option value="others">Others</option>
+</select>
+</div>
+</div>
+<!-- Mandatory Agreement -->
+<div class="p-6 bg-surface-container-low rounded-xl border border-border-subtle flex items-start gap-4">
+<div class="flex items-center h-6">
+<input class="w-[20px] h-[20px] rounded border-border-subtle text-teal-accent focus:ring-teal-accent" id="agreement" name="agreement" required="" type="checkbox"/>
+</div>
+<label class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed" for="agreement">
+                            I hereby agree to the terms and conditions of <span class="font-bold text-primary">Anakku.id</span>. I understand that my data will be handled securely and used only for communication regarding this seminar and future educational content related to SiSeminar.
+                        </label>
+</div>
+<!-- Submit Button -->
+<button class="w-full bg-teal-accent hover:bg-[#0f8a7d] text-white h-[56px] rounded-xl font-headline-sm text-headline-sm transition-all active:scale-[0.98] flex items-center justify-center gap-3 shadow-md" type="submit">
+                        Complete Registration
+                        <span class="material-symbols-outlined" data-icon="arrow_forward">arrow_forward</span>
+</button>
+<p class="text-center font-body-sm text-body-sm text-outline">
+                        * Required fields must be filled to proceed.
+                    </p>
+</form>
+</div>
+</section>
+</main>
+<!-- Footer -->
+<footer class="bg-surface-container-low border-t border-border-subtle w-full py-12 mt-auto">
+<div class="max-w-container-max mx-auto px-margin-mobile flex flex-col md:flex-row justify-between items-center gap-8">
+<div class="flex flex-col gap-2 items-center md:items-start text-center md:text-left">
+<div class="font-label-md text-label-md font-bold text-primary">SiSeminar</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant max-w-[300px]">Empowering parents with scientific knowledge for better child development.</p>
+</div>
+<div class="flex gap-8">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors" href="#">Contact Support</a>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant opacity-80">
+                © 2024 SiSeminar Management System. All rights reserved.
+            </p>
+</div>
+</footer>
+<script>
+        // Simple micro-interaction for form submission
+        document.getElementById('registrationForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const btn = this.querySelector('button[type="submit"]');
+            const originalContent = btn.innerHTML;
+            
+            btn.disabled = true;
+            btn.innerHTML = '<span class="material-symbols-outlined animate-spin" data-icon="progress_activity">progress_activity</span> Processing...';
+            
+            setTimeout(() => {
+                btn.classList.replace('bg-teal-accent', 'bg-success-green');
+                btn.innerHTML = '<span class="material-symbols-outlined" data-icon="check_circle">check_circle</span> Registration Successful!';
+                
+                // Show a success state after delay
+                setTimeout(() => {
+                    alert('Thank you for registering! You will receive a confirmation WhatsApp message shortly.');
+                    btn.disabled = false;
+                    btn.classList.replace('bg-success-green', 'bg-teal-accent');
+                    btn.innerHTML = originalContent;
+                    this.reset();
+                }, 1500);
+            }, 2000);
+        });
+
+        // Add focus effect to the card on interaction
+        const inputs = document.querySelectorAll('input, select');
+        const formCard = document.querySelector('section.max-w-\\[768px\\] > div');
+        
+        inputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                formCard.classList.add('border-primary', 'border-opacity-30');
+                formCard.style.boxShadow = '0 10px 25px -5px rgba(0, 35, 111, 0.05)';
+            });
+            input.addEventListener('blur', () => {
+                formCard.classList.remove('border-primary', 'border-opacity-30');
+                formCard.style.boxShadow = '';
+            });
+        });
+    </script>
+</body></html>

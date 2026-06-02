@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>SiSeminar Admin Dashboard - Participants</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;family=Plus+Jakarta+Sans:wght@600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    "colors": {
+                        "border-subtle": "#E2E8F0",
+                        "success-green": "#10B981",
+                        "outline": "#757682",
+                        "inverse-on-surface": "#eaf1ff",
+                        "tertiary-container": "#5c3800",
+                        "inverse-surface": "#213145",
+                        "background": "#f8f9ff",
+                        "tertiary-fixed": "#ffddb8",
+                        "on-surface-variant": "#444651",
+                        "tertiary-fixed-dim": "#ffb95f",
+                        "on-secondary-container": "#006f66",
+                        "secondary-fixed": "#89f5e7",
+                        "admin-blue-dark": "#172554",
+                        "outline-variant": "#c5c5d3",
+                        "on-tertiary-fixed-variant": "#653e00",
+                        "on-primary-container": "#90a8ff",
+                        "destructive-red": "#EF4444",
+                        "on-secondary-fixed": "#00201d",
+                        "surface-dim": "#cbdbf5",
+                        "error-container": "#ffdad6",
+                        "primary-fixed": "#dce1ff",
+                        "on-error": "#ffffff",
+                        "on-tertiary-container": "#ef9900",
+                        "error": "#ba1a1a",
+                        "on-tertiary-fixed": "#2a1700",
+                        "on-error-container": "#93000a",
+                        "on-primary-fixed": "#00164e",
+                        "primary-fixed-dim": "#b6c4ff",
+                        "surface-container": "#e5eeff",
+                        "inverse-primary": "#b6c4ff",
+                        "primary": "#00236f",
+                        "on-surface": "#0b1c30",
+                        "secondary-fixed-dim": "#6bd8cb",
+                        "secondary": "#006a61",
+                        "surface-container-lowest": "#ffffff",
+                        "secondary-container": "#86f2e4",
+                        "surface-container-low": "#eff4ff",
+                        "surface-tint": "#4059aa",
+                        "surface-bg": "#F8FAFC",
+                        "surface": "#f8f9ff",
+                        "on-primary-fixed-variant": "#264191",
+                        "on-background": "#0b1c30",
+                        "tertiary": "#3e2400",
+                        "on-secondary-fixed-variant": "#005049",
+                        "on-secondary": "#ffffff",
+                        "surface-container-highest": "#d3e4fe",
+                        "on-tertiary": "#ffffff",
+                        "surface-bright": "#f8f9ff",
+                        "surface-variant": "#d3e4fe",
+                        "primary-container": "#1e3a8a",
+                        "on-primary": "#ffffff",
+                        "teal-accent": "#14B8A6"
+                    },
+                    "borderRadius": {
+                        "DEFAULT": "0.125rem",
+                        "lg": "0.25rem",
+                        "xl": "0.5rem",
+                        "full": "0.75rem"
+                    },
+                    "spacing": {
+                        "base": "4px",
+                        "gutter": "24px",
+                        "margin-desktop": "40px",
+                        "margin-mobile": "16px",
+                        "container-max": "1280px"
+                    },
+                    "fontFamily": {
+                        "label-md": ["Inter"],
+                        "body-sm": ["Inter"],
+                        "label-sm": ["Inter"],
+                        "body-md": ["Inter"],
+                        "body-lg": ["Inter"],
+                        "headline-sm": ["Plus Jakarta Sans"],
+                        "display-lg": ["Plus Jakarta Sans"],
+                        "headline-lg": ["Plus Jakarta Sans"],
+                        "headline-md": ["Plus Jakarta Sans"],
+                        "headline-lg-mobile": ["Plus Jakarta Sans"]
+                    },
+                    "fontSize": {
+                        "label-md": ["14px", {"lineHeight": "20px", "letterSpacing": "0.05em", "fontWeight": "600"}],
+                        "body-sm": ["14px", {"lineHeight": "20px", "fontWeight": "400"}],
+                        "label-sm": ["12px", {"lineHeight": "16px", "fontWeight": "500"}],
+                        "body-md": ["16px", {"lineHeight": "24px", "fontWeight": "400"}],
+                        "body-lg": ["18px", {"lineHeight": "28px", "fontWeight": "400"}],
+                        "headline-sm": ["20px", {"lineHeight": "28px", "fontWeight": "600"}],
+                        "display-lg": ["48px", {"lineHeight": "60px", "letterSpacing": "-0.02em", "fontWeight": "700"}],
+                        "headline-lg": ["32px", {"lineHeight": "40px", "fontWeight": "600"}],
+                        "headline-md": ["24px", {"lineHeight": "32px", "fontWeight": "600"}],
+                        "headline-lg-mobile": ["28px", {"lineHeight": "36px", "fontWeight": "600"}]
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+    </style>
+</head>
+<body class="bg-surface-bg font-body-md text-on-surface">
+<!-- SideNavBar -->
+<aside class="bg-surface-container-lowest dark:bg-inverse-surface w-[280px] h-full fixed left-0 top-0 border-r border-border-subtle dark:border-outline-variant flex flex-col p-gutter z-50">
+<div class="mb-10">
+<h1 class="font-headline-md text-headline-md font-bold text-primary dark:text-primary-fixed">SiSeminar</h1>
+<p class="text-on-surface-variant font-label-sm uppercase tracking-widest mt-1">Admin Portal</p>
+</div>
+<nav class="flex flex-col gap-2">
+<a class="flex items-center gap-3 px-4 py-3 bg-secondary-container text-on-secondary-container rounded-xl font-bold transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+<span class="font-label-md text-label-md">Dashboard</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="event">event</span>
+<span class="font-label-md text-label-md">Events</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="handyman">handyman</span>
+<span class="font-label-md text-label-md">Form Builder</span>
+</a>
+<a class="flex items-center gap-3 px-4 py-3 text-on-surface-variant hover:bg-surface-container-low transition-all duration-200 ease-in-out" href="#">
+<span class="material-symbols-outlined" data-icon="settings">settings</span>
+<span class="font-label-md text-label-md">Settings</span>
+</a>
+</nav>
+<div class="mt-auto pt-6 border-t border-border-subtle">
+<div class="flex items-center gap-3">
+<img alt="SiSeminar Admin Avatar" class="w-10 h-10 rounded-full object-cover border-2 border-primary-container" data-alt="A professional headshot of a smiling male administrative professional in a clean, modern office environment. The lighting is bright and airy, reflecting a high-end corporate light-mode UI style with soft blue and teal tones. He is wearing a crisp white shirt, symbolizing efficiency and approachability within a modern seminar management dashboard." src="https://lh3.googleusercontent.com/aida/AP1WRLuvqYMGFB2kh59pb34KiBqkoT-vcP93BYEDuKqJV2iFrtts-Lz53bIMWP_qrwHX_SEyXMRkME7Qs5DIqlaebl1DyMQpazo9eYjQFelr0ZpxGq_bKaUG54wSMD9oAt04CvtZCHdx1sJOy57ySickErSO4Dxbyv4GZhbUAA8InEZLXX0D8MWk9YVAc-WfKWVtPaw_RIobCju8SYLi936wV66W-hwAHeuXHgMaUPiLmR85DpUlTs1lkFkjcQ"/>
+<div>
+<p class="font-label-md text-label-md text-on-surface">Alex Thompson</p>
+<p class="text-xs text-on-surface-variant">Lead Administrator</p>
+</div>
+</div>
+</div>
+</aside>
+<!-- TopNavBar -->
+<header class="bg-surface-container-lowest dark:bg-inverse-surface border-b border-border-subtle dark:border-outline-variant fixed top-0 left-0 w-full z-40">
+<div class="flex justify-between items-center h-16 px-margin-desktop ml-[280px]">
+<div class="flex items-center gap-4 flex-1">
+<div class="relative w-full max-w-md group">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant text-[20px] pointer-events-none group-focus-within:text-primary transition-colors">search</span>
+<input class="w-full bg-surface-container-low border-none rounded-full h-10 pl-10 pr-4 text-body-sm focus:ring-2 focus:ring-primary transition-all" placeholder="Search participants..." type="text"/>
+</div>
+</div>
+<div class="flex items-center gap-6">
+<div class="flex items-center gap-2">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all scale-95 active:scale-90" data-icon="notifications">notifications</button>
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-all scale-95 active:scale-90" data-icon="help">help</button>
+</div>
+<div class="h-8 w-[1px] bg-border-subtle"></div>
+<img alt="User Profile" class="w-8 h-8 rounded-full border border-border-subtle cursor-pointer hover:opacity-80 transition-opacity" data-alt="A detailed closeup of a corporate avatar in a rounded frame, emphasizing a professional and authoritative presence. The visual aesthetic is clean and functional, with soft studio lighting and a palette that integrates seamlessly with a high-end SaaS productivity platform using primary blues and whites." src="https://lh3.googleusercontent.com/aida/AP1WRLu2cmpyc5HG9XWwpb1C6KNu4d8bM85s1sdJMbBRalmgOcD5FQcUsBzC3od5s3S_wDEsgOFzp9FjExY3zQTMGcjSRqdG3ry_Fpg5Rf26x1BZNrM1ZeVeqmv8iayzrkg2b35EyyyqH7hZwL7bmf7epLfwXw4LL7CF2_uBypQWvVG7XHFh8loke2VKhPcvsXXd8VTnn3D9ONph7KgeeK2S17uTW64R-bxLqaLLYB2AXQL4a74_ZlXfMSK82Q"/>
+</div>
+</div>
+</header>
+<!-- Main Content Canvas -->
+<main class="ml-[280px] pt-16 min-h-screen flex flex-col">
+<div class="p-8 flex-1">
+<!-- Breadcrumbs & Actions -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8">
+<div>
+<h2 class="font-headline-md text-headline-md text-primary mb-1">Participant Directory</h2>
+<div class="flex items-center gap-2 text-on-surface-variant font-label-sm">
+<span>Events</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span>Annual Leadership Seminar 2024</span>
+<span class="material-symbols-outlined text-[14px]">chevron_right</span>
+<span class="text-on-surface">Registered Participants</span>
+</div>
+</div>
+<div class="flex gap-3">
+<button class="flex items-center gap-2 px-5 py-2.5 bg-white border border-admin-blue-dark text-admin-blue-dark rounded-xl font-bold hover:bg-surface-container-low transition-all">
+<span class="material-symbols-outlined text-[20px]" data-icon="upload">upload</span>
+<span class="font-label-md text-label-md">Export CSV</span>
+</button>
+<button class="flex items-center gap-2 px-5 py-2.5 bg-teal-accent text-white rounded-xl font-bold hover:brightness-110 transition-all shadow-sm">
+<span class="material-symbols-outlined text-[20px]" data-icon="add">add</span>
+<span class="font-label-md text-label-md">Add Participant</span>
+</button>
+</div>
+</div>
+<!-- Filters Bar -->
+<div class="bg-white border border-border-subtle rounded-xl p-4 mb-6 flex flex-wrap items-center gap-4">
+<div class="flex items-center gap-3 flex-1 min-w-[240px]">
+<span class="font-label-md text-label-md text-on-surface-variant whitespace-nowrap">Filter by:</span>
+<select class="flex-1 max-w-[200px] h-10 border-border-subtle rounded-lg text-body-sm focus:border-primary focus:ring-primary transition-all">
+<option>Select Event</option>
+<option>Annual Leadership 2024</option>
+<option>Summer Workshop</option>
+<option>Parenting Summit</option>
+</select>
+<select class="flex-1 max-w-[200px] h-10 border-border-subtle rounded-lg text-body-sm focus:border-primary focus:ring-primary transition-all">
+<option>All Districts</option>
+<option>North District</option>
+<option>Central Business</option>
+<option>South Bay</option>
+<option>East Side</option>
+</select>
+</div>
+<div class="flex items-center gap-2">
+<button class="flex items-center justify-center w-10 h-10 bg-surface-container-low text-primary rounded-lg hover:bg-surface-container-high transition-colors" title="Clear Filters">
+<span class="material-symbols-outlined text-[20px]">filter_alt_off</span>
+</button>
+<div class="h-6 w-[1px] bg-border-subtle mx-2"></div>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Showing <span class="font-bold text-on-surface">128</span> Participants</span>
+</div>
+</div>
+<!-- Spreadsheet View Table -->
+<div class="bg-white border border-border-subtle rounded-2xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full text-left border-collapse">
+<thead>
+<tr class="bg-surface-container-low border-b border-border-subtle">
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">
+<div class="flex items-center gap-2">
+                                        Name
+                                        <span class="material-symbols-outlined text-[16px] cursor-pointer">unfold_more</span>
+</div>
+</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Child Age</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">WhatsApp</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Attendee Age</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Source</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">District</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Status</th>
+<th class="px-6 py-4 font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider text-right">Actions</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-border-subtle">
+<!-- Row 1 -->
+<tr class="hover:bg-surface-bg transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary-container text-on-primary-container flex items-center justify-center font-bold text-xs">SM</div>
+<span class="font-label-md text-on-surface">Sarah Mitchell</span>
+</div>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">6 years</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">+62 812-3456-7890</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">32</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-surface-container-low text-on-surface-variant rounded-full text-[10px] font-bold uppercase tracking-tighter">Instagram</span>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">North District</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-success-green/10 text-success-green rounded-full font-label-sm text-[12px]">
+<span class="w-1.5 h-1.5 rounded-full bg-success-green"></span>
+                                        Confirmed
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Row 2 -->
+<tr class="hover:bg-surface-bg transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-secondary-container text-on-secondary-container flex items-center justify-center font-bold text-xs">DW</div>
+<span class="font-label-md text-on-surface">David Wilson</span>
+</div>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">4 &amp; 8 years</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">+62 811-9988-7766</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">41</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-surface-container-low text-on-surface-variant rounded-full text-[10px] font-bold uppercase tracking-tighter">Referral</span>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">Central Business</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-tertiary-fixed/30 text-on-tertiary-fixed-variant rounded-full font-label-sm text-[12px]">
+<span class="w-1.5 h-1.5 rounded-full bg-tertiary-fixed-dim"></span>
+                                        Pending
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Row 3 -->
+<tr class="hover:bg-surface-bg transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-tertiary-fixed text-on-tertiary-fixed flex items-center justify-center font-bold text-xs">EL</div>
+<span class="font-label-md text-on-surface">Elena Lavoie</span>
+</div>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">10 years</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">+62 813-1122-3344</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">29</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-surface-container-low text-on-surface-variant rounded-full text-[10px] font-bold uppercase tracking-tighter">Facebook</span>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">South Bay</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-success-green/10 text-success-green rounded-full font-label-sm text-[12px]">
+<span class="w-1.5 h-1.5 rounded-full bg-success-green"></span>
+                                        Confirmed
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+<!-- Row 4 -->
+<tr class="hover:bg-surface-bg transition-colors group">
+<td class="px-6 py-4">
+<div class="flex items-center gap-3">
+<div class="w-8 h-8 rounded-full bg-primary/10 text-primary flex items-center justify-center font-bold text-xs">RB</div>
+<span class="font-label-md text-on-surface">Robert Brown</span>
+</div>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">5 years</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">+62 812-4455-6677</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">38</td>
+<td class="px-6 py-4">
+<span class="px-2 py-1 bg-surface-container-low text-on-surface-variant rounded-full text-[10px] font-bold uppercase tracking-tighter">Website</span>
+</td>
+<td class="px-6 py-4 text-body-sm text-on-surface-variant">East Side</td>
+<td class="px-6 py-4">
+<span class="inline-flex items-center gap-1.5 px-3 py-1 bg-destructive-red/10 text-destructive-red rounded-full font-label-sm text-[12px]">
+<span class="w-1.5 h-1.5 rounded-full bg-destructive-red"></span>
+                                        Cancelled
+                                    </span>
+</td>
+<td class="px-6 py-4 text-right">
+<button class="material-symbols-outlined text-on-surface-variant hover:text-primary transition-colors">more_vert</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+<!-- Pagination -->
+<div class="px-6 py-4 bg-surface-container-lowest border-t border-border-subtle flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-on-surface-variant">Showing 1 to 10 of 128 results</span>
+<div class="flex items-center gap-1">
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-low text-on-surface-variant disabled:opacity-30" disabled="">
+<span class="material-symbols-outlined">chevron_left</span>
+</button>
+<button class="w-8 h-8 flex items-center justify-center rounded bg-primary text-white font-label-sm">1</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-low text-on-surface-variant font-label-sm">2</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-low text-on-surface-variant font-label-sm">3</button>
+<span class="px-2">...</span>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-low text-on-surface-variant font-label-sm">13</button>
+<button class="w-8 h-8 flex items-center justify-center rounded hover:bg-surface-container-low text-on-surface-variant">
+<span class="material-symbols-outlined">chevron_right</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Footer -->
+<footer class="bg-surface-container-low dark:bg-inverse-surface py-8 border-t border-border-subtle">
+<div class="max-w-container-max mx-auto px-margin-mobile flex flex-col md:flex-row justify-between items-center gap-4">
+<div class="flex items-center gap-2">
+<span class="font-label-md text-label-md font-bold text-primary">SiSeminar</span>
+<span class="text-on-surface-variant font-body-sm">© 2024 SiSeminar Management System. All rights reserved.</span>
+</div>
+<div class="flex items-center gap-6">
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100" href="#">Privacy Policy</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100" href="#">Terms of Service</a>
+<a class="font-body-sm text-body-sm text-on-surface-variant hover:text-secondary transition-colors opacity-80 hover:opacity-100" href="#">Contact Support</a>
+</div>
+</div>
+</footer>
+</main>
+<!-- FAB (Floating Action Button) - Suppressed on Dashboard Spreadsheet View as per logic -->
+<script>
+        // Micro-interactions
+        document.querySelectorAll('tr').forEach(row => {
+            row.addEventListener('click', () => {
+                // Future: open details panel
+            });
+        });
+
+        // Search highlight interaction
+        const searchInput = document.querySelector('input[type="text"]');
+        searchInput.addEventListener('focus', () => {
+            searchInput.parentElement.classList.add('ring-2', 'ring-primary/20');
+        });
+        searchInput.addEventListener('blur', () => {
+            searchInput.parentElement.classList.remove('ring-2', 'ring-primary/20');
+        });
+    </script>
+</body></html>
