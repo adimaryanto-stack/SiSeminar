@@ -339,6 +339,41 @@ const Store = (() => {
     // Sync to InsForge in background
     const sdk = await ensureSdk();
     if (sdk) {
+      // Helper function to safely insert user into public.users table (resolving unique phone duplicates)
+      const ensurePublicUser = async (authId) => {
+        try {
+          // Delete any existing user with the same phone but different ID to prevent unique constraint failures
+          const { data: existingUsers } = await sdk.database.from('users').select('id').eq('phone', user.phone);
+          if (existingUsers && existingUsers.length > 0) {
+            const oldId = existingUsers[0].id;
+            if (oldId !== authId) {
+              console.log("[InsForge] Deleting old public user seed:", oldId);
+              await sdk.database.from('users').delete().eq('id', oldId);
+            }
+          }
+        } catch (err) {
+          console.warn("[InsForge] Gagal membersihkan user lama:", err);
+        }
+
+        try {
+          // Also check if they are present in the public users table in PostgreSQL
+          const { data: dbUser } = await sdk.database.from('users').select('id').eq('id', authId);
+          if (!dbUser || dbUser.length === 0) {
+            await sdk.database.from('users').insert([{
+              id: authId,
+              name: user.name,
+              phone: user.phone,
+              password: user.password,
+              role: user.role,
+              email: user.email,
+              created_at: user.createdAt
+            }]);
+          }
+        } catch (err) {
+          console.warn("[InsForge] Gagal menyisipkan user publik:", err);
+        }
+      };
+
       try {
         // Register Auth in InsForge first
         const signUpRes = await sdk.auth.signUp({
@@ -372,19 +407,8 @@ const Store = (() => {
                   set(KEYS.users, users);
                 }
                 
-                // Also ensure they are present in the public users table in PostgreSQL
-                const { data: dbUser } = await sdk.database.from('users').select('id').eq('id', authId);
-                if (!dbUser || dbUser.length === 0) {
-                  await sdk.database.from('users').insert([{
-                    id: authId,
-                    name: user.name,
-                    phone: user.phone,
-                    password: user.password,
-                    role: user.role,
-                    email: user.email,
-                    created_at: user.createdAt
-                  }]);
-                }
+                // Ensure present in public users
+                await ensurePublicUser(authId);
               }
             } catch (signInErr) {
               console.warn("[InsForge] Gagal sign-in fallback:", signInErr);
@@ -404,15 +428,7 @@ const Store = (() => {
           }
 
           // Insert to public users table
-          await sdk.database.from('users').insert([{
-            id: authId,
-            name: user.name,
-            phone: user.phone,
-            password: user.password,
-            role: user.role,
-            email: user.email,
-            created_at: user.createdAt
-          }]);
+          await ensurePublicUser(authId);
         }
       } catch (err) {
         // Handle duplicate key (email already exists in Auth) for thrown exceptions
@@ -434,19 +450,8 @@ const Store = (() => {
                 set(KEYS.users, users);
               }
               
-              // Also ensure they are present in the public users table in PostgreSQL
-              const { data: dbUser } = await sdk.database.from('users').select('id').eq('id', authId);
-              if (!dbUser || dbUser.length === 0) {
-                await sdk.database.from('users').insert([{
-                  id: authId,
-                  name: user.name,
-                  phone: user.phone,
-                  password: user.password,
-                  role: user.role,
-                  email: user.email,
-                  created_at: user.createdAt
-                }]);
-              }
+              // Ensure present in public users
+              await ensurePublicUser(authId);
             }
           } catch (signInErr) {
             console.warn("[InsForge] Gagal sign-in fallback:", signInErr);
