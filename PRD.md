@@ -1,6 +1,8 @@
 # 📑 Product Requirement Document (PRD) — SiSeminar v2.0
 ### Sistem Informasi Manajemen Komunikasi Seminar (BaaS InsForge Edition)
 
+[![Deploy to InsForge](https://img.shields.io/badge/Deploy%20to-InsForge-8b5cf6?style=for-the-badge&logo=github)](https://insforge.dev)
+
 ---
 
 ## 1. Project Overview

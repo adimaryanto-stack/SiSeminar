@@ -1,6 +1,8 @@
 # PRD — SiSeminar v2
 ### Sistem Informasi Manajemen Komunikasi Seminar
 
+[![Deploy to InsForge](https://img.shields.io/badge/Deploy%20to-InsForge-8b5cf6?style=for-the-badge&logo=github)](https://insforge.dev)
+
 > **Versi:** 2.0  
 > **Tanggal:** Juni 2026  
 > **Status:** Draft — Siap Development

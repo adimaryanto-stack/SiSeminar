@@ -688,11 +688,46 @@ const QuestionnairePage = (() => {
     const container = App.getPageContent();
     if (!container) return;
 
+    const events = Store.getEvents();
+    if (!eventId && events.length > 0) {
+      eventId = events[0].id;
+    }
+
+    if (!eventId) {
+      container.innerHTML = `
+        <div class="animate-fade-in mb-12">
+          <!-- Page Header -->
+          <div class="flex items-center justify-between mb-8 wrap gap-4">
+            <div>
+              <h1 class="page-title">Hasil Analisis Feedback</h1>
+              <div class="breadcrumbs">
+                <span>Dashboard</span>
+                <span class="separator">/</span>
+                <span class="active">Hasil Feedback</span>
+              </div>
+            </div>
+            <a href="#events" class="btn btn-secondary">Kembali</a>
+          </div>
+
+          <div class="card empty-state" style="min-height:50vh;">
+            <span class="material-symbols-outlined" style="font-size:56px;">query_stats</span>
+            <h3>Belum Ada Event</h3>
+            <p>Silakan buat event seminar baru terlebih dahulu untuk melihat analisis feedback.</p>
+          </div>
+        </div>
+      `;
+      return;
+    }
+
     activeEvent = Store.getEventById(eventId);
     if (!activeEvent) {
       container.innerHTML = `<div class="empty-state"><h3>Event Tidak Ditemukan</h3><a href="#events" class="btn btn-primary mt-4">Kembali</a></div>`;
       return;
     }
+
+    const eventOptions = events.map(e =>
+      `<option value="${e.id}" ${e.id === eventId ? 'selected' : ''}>${escapeHtml(e.title)}</option>`
+    ).join('');
 
     const template = Store.getQuestionnaire(eventId);
     const responses = Store.getFeedbackResponses(eventId);
@@ -705,12 +740,17 @@ const QuestionnairePage = (() => {
             <div>
               <h1 class="page-title">Hasil Analisis Feedback</h1>
               <div class="breadcrumbs">
-                <a href="#events">Manajemen Event</a>
+                <span>Dashboard</span>
                 <span class="separator">/</span>
-                <span>Analisis Kuesioner</span>
+                <span class="active">Hasil Feedback</span>
               </div>
             </div>
-            <a href="#events" class="btn btn-secondary">Kembali</a>
+            <div class="flex gap-3">
+              <select class="form-select" id="feedbackEventSelect" style="width: 250px; height: 38px; padding: 0 12px; border-radius: var(--radius-md);">
+                ${eventOptions}
+              </select>
+              <a href="#events" class="btn btn-secondary">Kembali</a>
+            </div>
           </div>
 
           <div class="card empty-state" style="min-height:50vh;">
@@ -721,6 +761,7 @@ const QuestionnairePage = (() => {
           </div>
         </div>
       `;
+      bindResultsDropdownOnly();
       return;
     }
 
@@ -732,12 +773,17 @@ const QuestionnairePage = (() => {
             <div>
               <h1 class="page-title">Hasil Analisis Feedback</h1>
               <div class="breadcrumbs">
-                <a href="#events">Manajemen Event</a>
+                <span>Dashboard</span>
                 <span class="separator">/</span>
-                <span>Analisis Kuesioner</span>
+                <span class="active">Hasil Feedback</span>
               </div>
             </div>
-            <a href="#events" class="btn btn-secondary">Kembali</a>
+            <div class="flex gap-3">
+              <select class="form-select" id="feedbackEventSelect" style="width: 250px; height: 38px; padding: 0 12px; border-radius: var(--radius-md);">
+                ${eventOptions}
+              </select>
+              <a href="#events" class="btn btn-secondary">Kembali</a>
+            </div>
           </div>
 
           <div class="card empty-state" style="min-height:50vh;">
@@ -748,6 +794,7 @@ const QuestionnairePage = (() => {
           </div>
         </div>
       `;
+      bindResultsDropdownOnly();
       return;
     }
 
@@ -807,12 +854,15 @@ const QuestionnairePage = (() => {
           <div>
             <h1 class="page-title">Hasil Analisis Feedback</h1>
             <div class="breadcrumbs">
-              <a href="#events">Manajemen Event</a>
+              <span>Dashboard</span>
               <span class="separator">/</span>
-              <span>Analisis Kuesioner</span>
+              <span class="active">Hasil Feedback</span>
             </div>
           </div>
           <div class="flex gap-3">
+            <select class="form-select" id="feedbackEventSelect" style="width: 250px; height: 38px; padding: 0 12px; border-radius: var(--radius-md);">
+              ${eventOptions}
+            </select>
             <button class="btn btn-secondary" id="btnExportFeedback">
               <span class="material-symbols-outlined" style="font-size:18px;">download</span>
               Ekspor Hasil (CSV)
@@ -973,7 +1023,19 @@ const QuestionnairePage = (() => {
     bindResultsEvents(eventId, responses, template);
   }
 
+  function bindResultsDropdownOnly() {
+    const select = document.getElementById('feedbackEventSelect');
+    if (select) {
+      select.addEventListener('change', (e) => {
+        const val = e.target.value;
+        window.location.hash = val ? `#feedback-results?event=${val}` : '#feedback-results';
+      });
+    }
+  }
+
   function bindResultsEvents(eventId, responses, template) {
+    bindResultsDropdownOnly();
+
     const exportBtn = document.getElementById('btnExportFeedback');
     if (exportBtn) {
       exportBtn.addEventListener('click', () => {

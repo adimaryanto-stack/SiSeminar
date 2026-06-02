@@ -13,6 +13,7 @@ const App = (() => {
     'participants': { label: 'Data Peserta', icon: 'group', render: () => ParticipantsPage.render() },
     'chat': { label: 'Chat Grup', icon: 'forum', render: () => ChatPage.render() },
     'attendance': { label: 'Presensi', icon: 'qr_code_scanner', render: () => AttendancePage.render() },
+    'feedback-results': { label: 'Hasil Feedback', icon: 'reviews', render: () => QuestionnairePage.renderResults(App.getRouteParams().params.event) },
   };
 
   const publicRoutes = ['login', 'register', 'checkin'];
@@ -123,9 +124,6 @@ const App = (() => {
     } else if (route === 'questionnaire-builder') {
       currentRoute = route;
       renderAdminLayoutCustom(() => QuestionnairePage.renderBuilder(params.event));
-    } else if (route === 'feedback-results') {
-      currentRoute = route;
-      renderAdminLayoutCustom(() => QuestionnairePage.renderResults(params.event));
     } else {
       navigate('events');
     }
