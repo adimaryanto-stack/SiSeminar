@@ -58,14 +58,10 @@
   <div id="app"></div>
 
   <!-- JavaScript Modules (load order matters) -->
-  <script>
-    window.module = { exports: {} };
-  </script>
-  <script src="js/insforge_sdk.js?v=1.3"></script>
-  <script>
-    window.InsForge = window.module.exports;
-    window.createClient = window.InsForge.createClient;
-    window.insforge = window.createClient({
+  <script type="module">
+    import { createClient } from 'https://cdn.jsdelivr.net/npm/@insforge/sdk@1.3.0/dist/index.mjs';
+    window.createClient = createClient;
+    window.insforge = createClient({
       baseUrl: 'https://yf9g53qm.ap-southeast.insforge.app',
       anonKey: 'ik_27bb066827cca211bd663f03ae24d47a'
     });

@@ -1,6 +1,6 @@
 /* ============================================================
    SiSeminar — store.js
-   Hybrid Data Layer using LocalStorage and InsForge Postgres
+   Hybrid Data Layer using LocalStorage and Dynamic InsForge SDK
    ============================================================ */
 
 const Store = (() => {
@@ -18,6 +18,7 @@ const Store = (() => {
   };
 
   let isSyncing = false;
+  let sdkLoaded = null;
 
   // ============ Helpers ============
   function generateId() {
@@ -78,22 +79,44 @@ const Store = (() => {
     localStorage.setItem(key, JSON.stringify(data));
   }
 
+  // ============ Dynamic SDK Loader ============
+  async function ensureSdk() {
+    if (sdkLoaded) return sdkLoaded;
+    try {
+      // Dynamically import the ESM bundle from jsDelivr
+      const module = await import('https://cdn.jsdelivr.net/npm/@insforge/sdk@1.3.0/dist/index.mjs');
+      window.insforge = module.createClient({
+        baseUrl: 'https://yf9g53qm.ap-southeast.insforge.app',
+        anonKey: 'ik_27bb066827cca211bd663f03ae24d47a'
+      });
+      sdkLoaded = window.insforge;
+      console.log("[InsForge] SDK client loaded dynamically successfully!");
+      return sdkLoaded;
+    } catch (err) {
+      console.error("[InsForge] Gagal memuat SDK secara dinamis:", err);
+      return null;
+    }
+  }
+
   // ============ InsForge Backend Sync ============
   async function syncWithBackend() {
-    if (isSyncing || !window.insforge) return;
+    const sdk = await ensureSdk();
+    if (!sdk) return null;
+    
+    if (isSyncing) return sdk;
     isSyncing = true;
     console.log("[InsForge] Memulai sinkronisasi dengan database Postgres...");
     try {
       // 1. Users
-      const { data: users } = await window.insforge.database.from('users').select('*');
+      const { data: users } = await sdk.database.from('users').select('*');
       if (users) set(KEYS.users, users);
 
       // 2. Events
-      const { data: events } = await window.insforge.database.from('events').select('*');
+      const { data: events } = await sdk.database.from('events').select('*');
       if (events) set(KEYS.events, events);
 
       // 3. Form Fields
-      const { data: formFields } = await window.insforge.database.from('form_fields').select('*');
+      const { data: formFields } = await sdk.database.from('form_fields').select('*');
       if (formFields) {
         set(KEYS.formFields, formFields.map(f => ({
           id: f.id,
@@ -109,7 +132,7 @@ const Store = (() => {
       }
 
       // 4. Registrations
-      const { data: regs } = await window.insforge.database.from('registrations').select('*');
+      const { data: regs } = await sdk.database.from('registrations').select('*');
       if (regs) {
         set(KEYS.registrations, regs.map(r => ({
           id: r.id,
@@ -124,7 +147,7 @@ const Store = (() => {
       }
 
       // 5. Chat Groups
-      const { data: groups } = await window.insforge.database.from('chat_groups').select('*');
+      const { data: groups } = await sdk.database.from('chat_groups').select('*');
       if (groups) {
         set(KEYS.chatGroups, groups.map(g => ({
           id: g.id,
@@ -139,7 +162,7 @@ const Store = (() => {
       }
 
       // 6. Chat Members
-      const { data: members } = await window.insforge.database.from('chat_members').select('*');
+      const { data: members } = await sdk.database.from('chat_members').select('*');
       if (members) {
         set(KEYS.chatMembers, members.map(m => ({
           id: m.id,
@@ -150,7 +173,7 @@ const Store = (() => {
       }
 
       // 7. Messages
-      const { data: msgs } = await window.insforge.database.from('messages').select('*');
+      const { data: msgs } = await sdk.database.from('messages').select('*');
       if (msgs) {
         set(KEYS.messages, msgs.map(m => ({
           id: m.id,
@@ -164,7 +187,7 @@ const Store = (() => {
       }
 
       // 8. Attendance
-      const { data: att } = await window.insforge.database.from('attendance').select('*');
+      const { data: att } = await sdk.database.from('attendance').select('*');
       if (att) {
         set(KEYS.attendance, att.map(a => ({
           id: a.id,
@@ -184,11 +207,13 @@ const Store = (() => {
     } finally {
       isSyncing = false;
     }
+    return sdk;
   }
 
   // ============ Auth ============
   async function login(identifier, password) {
-    if (!window.insforge) {
+    const sdk = await ensureSdk();
+    if (!sdk) {
       // Local fallback
       const users = get(KEYS.users);
       const normalizedPhone = normalizePhone(identifier);
@@ -214,7 +239,7 @@ const Store = (() => {
         }
       }
 
-      const { data, error } = await window.insforge.auth.signInWithPassword({ email, password });
+      const { data, error } = await sdk.auth.signInWithPassword({ email, password });
       if (error) {
         return { success: false, error: error.message };
       }
@@ -235,10 +260,11 @@ const Store = (() => {
     }
   }
 
-  function logout() {
+  async function logout() {
     localStorage.removeItem(KEYS.currentUser);
-    if (window.insforge) {
-      window.insforge.auth.signOut();
+    const sdk = await ensureSdk();
+    if (sdk) {
+      sdk.auth.signOut();
     }
   }
 
@@ -294,10 +320,11 @@ const Store = (() => {
     set(KEYS.users, users);
 
     // Sync to InsForge in background
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
         // Register Auth in InsForge first
-        await window.insforge.auth.signUp({
+        await sdk.auth.signUp({
           email: user.email,
           password: user.password,
           profile: {
@@ -307,7 +334,7 @@ const Store = (() => {
         });
 
         // Insert to public users table
-        await window.insforge.database.from('users').insert([{
+        await sdk.database.from('users').insert([{
           id: user.id,
           name: user.name,
           phone: user.phone,
@@ -351,9 +378,10 @@ const Store = (() => {
     set(KEYS.events, events);
 
     // Sync to InsForge
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('events').insert([{
+        await sdk.database.from('events').insert([{
           id: event.id,
           title: event.title,
           description: event.description,
@@ -385,9 +413,10 @@ const Store = (() => {
     set(KEYS.events, events);
 
     // Sync to InsForge
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('events').update({
+        await sdk.database.from('events').update({
           title: data.title,
           description: data.description,
           date: data.date,
@@ -407,9 +436,10 @@ const Store = (() => {
 
   async function deleteEvent(id) {
     set(KEYS.events, get(KEYS.events).filter(e => e.id !== id));
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('events').delete().eq('id', id);
+        await sdk.database.from('events').delete().eq('id', id);
       } catch (err) {
         console.warn("[InsForge] Gagal menghapus event di cloud:", err);
       }
@@ -439,9 +469,10 @@ const Store = (() => {
     set(KEYS.formFields, fields);
 
     // Sync to InsForge
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('form_fields').insert([{
+        await sdk.database.from('form_fields').insert([{
           id: field.id,
           event_id: field.eventId,
           label: field.label,
@@ -467,9 +498,10 @@ const Store = (() => {
     fields[idx] = { ...fields[idx], ...data };
     set(KEYS.formFields, fields);
 
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('form_fields').update({
+        await sdk.database.from('form_fields').update({
           label: data.label,
           field_type: data.fieldType,
           options: data.options,
@@ -487,9 +519,10 @@ const Store = (() => {
 
   async function deleteFormField(id) {
     set(KEYS.formFields, get(KEYS.formFields).filter(f => f.id !== id));
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('form_fields').delete().eq('id', id);
+        await sdk.database.from('form_fields').delete().eq('id', id);
       } catch (err) {
         console.warn("[InsForge] Gagal menghapus form field di cloud:", err);
       }
@@ -504,10 +537,11 @@ const Store = (() => {
     });
     set(KEYS.formFields, fields);
 
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
         for (let i = 0; i < orderedIds.length; i++) {
-          await window.insforge.database.from('form_fields').update({ order_index: i }).eq('id', orderedIds[i]);
+          await sdk.database.from('form_fields').update({ order_index: i }).eq('id', orderedIds[i]);
         }
       } catch (err) {
         console.warn("[InsForge] Gagal menyelaraskan penyusunan ulang form fields:", err);
@@ -544,9 +578,10 @@ const Store = (() => {
     set(KEYS.registrations, regs);
 
     // Sync to InsForge
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('registrations').insert([{
+        await sdk.database.from('registrations').insert([{
           id: reg.id,
           event_id: reg.eventId,
           user_id: reg.userId,
@@ -583,9 +618,10 @@ const Store = (() => {
     regs[idx] = { ...regs[idx], ...data };
     set(KEYS.registrations, regs);
 
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('registrations').update({
+        await sdk.database.from('registrations').update({
           status: data.status
         }).eq('id', id);
       } catch (err) {
@@ -598,9 +634,10 @@ const Store = (() => {
 
   async function deleteRegistration(id) {
     set(KEYS.registrations, get(KEYS.registrations).filter(r => r.id !== id));
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('registrations').delete().eq('id', id);
+        await sdk.database.from('registrations').delete().eq('id', id);
       } catch (err) {
         console.warn("[InsForge] Gagal menghapus registrasi di cloud:", err);
       }
@@ -639,9 +676,10 @@ const Store = (() => {
     set(KEYS.chatGroups, groups);
 
     // Sync to InsForge
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('chat_groups').insert([{
+        await sdk.database.from('chat_groups').insert([{
           id: group.id,
           event_id: group.eventId,
           name: group.name,
@@ -670,9 +708,10 @@ const Store = (() => {
     groups[idx] = { ...groups[idx], ...data };
     set(KEYS.chatGroups, groups);
 
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('chat_groups').update({
+        await sdk.database.from('chat_groups').update({
           name: data.name,
           description: data.description,
           is_locked: data.isLocked
@@ -690,9 +729,10 @@ const Store = (() => {
     set(KEYS.chatMembers, get(KEYS.chatMembers).filter(m => m.groupId !== id));
     set(KEYS.messages, get(KEYS.messages).filter(m => m.groupId !== id));
 
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('chat_groups').delete().eq('id', id);
+        await sdk.database.from('chat_groups').delete().eq('id', id);
       } catch (err) {
         console.warn("[InsForge] Gagal menghapus grup chat di cloud:", err);
       }
@@ -721,9 +761,10 @@ const Store = (() => {
     members.push(member);
     set(KEYS.chatMembers, members);
 
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('chat_members').insert([{
+        await sdk.database.from('chat_members').insert([{
           id: member.id,
           group_id: member.groupId,
           user_id: member.userId,
@@ -739,9 +780,10 @@ const Store = (() => {
 
   async function removeChatMember(groupId, userId) {
     set(KEYS.chatMembers, get(KEYS.chatMembers).filter(m => !(m.groupId === groupId && m.userId === userId)));
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('chat_members').delete().eq('group_id', groupId).eq('user_id', userId);
+        await sdk.database.from('chat_members').delete().eq('group_id', groupId).eq('user_id', userId);
       } catch (err) {
         console.warn("[InsForge] Gagal mengeluarkan anggota grup chat di cloud:", err);
       }
@@ -767,9 +809,10 @@ const Store = (() => {
     messages.push(msg);
     set(KEYS.messages, messages);
 
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('messages').insert([{
+        await sdk.database.from('messages').insert([{
           id: msg.id,
           group_id: msg.groupId,
           sender_id: msg.senderId,
@@ -820,9 +863,10 @@ const Store = (() => {
     attendance.push(record);
     set(KEYS.attendance, attendance);
 
-    if (window.insforge) {
+    const sdk = await ensureSdk();
+    if (sdk) {
       try {
-        await window.insforge.database.from('attendance').insert([{
+        await sdk.database.from('attendance').insert([{
           id: record.id,
           event_id: record.eventId,
           user_id: record.userId,
@@ -881,12 +925,10 @@ const Store = (() => {
 
   // ============ Initialize Demo Data ============
   function initDemoData() {
-    // If window.insforge is active, let's sync instead of re-seeding local storage!
-    if (window.insforge) {
-      syncWithBackend();
-      localStorage.setItem(KEYS.initialized, 'true');
-      return;
-    }
+    // If we have dynamic SDK, let's sync in background!
+    ensureSdk().then(sdk => {
+      if (sdk) syncWithBackend();
+    });
 
     if (localStorage.getItem(KEYS.initialized) && get(KEYS.events).length > 0) return;
 
