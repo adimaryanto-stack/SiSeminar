@@ -1,11 +1,13 @@
 /* ============================================================
    SiSeminar — chat.js
-   Chat Group Page Module
+   Chat Group Page Module — with InsForge Realtime
    ============================================================ */
 
 const ChatPage = (() => {
   let selectedGroupId = null;
   let currentGroups = [];
+  let realtimeSubscribed = null; // track currently subscribed channel
+  let pollingInterval = null;    // fallback polling timer
 
   // ============ Main Render ============
   function render() {
@@ -22,6 +24,7 @@ const ChatPage = (() => {
 
     // If no groups, show empty state
     if (currentGroups.length === 0) {
+      cleanupRealtime();
       container.innerHTML = renderEmptyState(isAdmin);
       if (isAdmin) {
         const createBtn = document.getElementById('btnCreateGroupEmpty');
@@ -45,6 +48,127 @@ const ChatPage = (() => {
     bindSidebarEvents(isAdmin);
     bindChatEvents(isAdmin);
     scrollToBottom();
+
+    // Subscribe to realtime channel for the selected group
+    subscribeToGroup(selectedGroupId);
+  }
+
+  // ============ Realtime Subscription ============
+  async function subscribeToGroup(groupId) {
+    if (!groupId) return;
+
+    const channelName = `chat:${groupId}`;
+
+    // Already subscribed to this channel
+    if (realtimeSubscribed === channelName) return;
+
+    // Cleanup previous subscription
+    cleanupRealtime();
+
+    try {
+      const sdk = window.insforge;
+      if (!sdk || !sdk.realtime) {
+        // Fallback: polling every 3 seconds
+        startPolling(groupId);
+        return;
+      }
+
+      // Connect to realtime server
+      await sdk.realtime.connect();
+
+      // Subscribe to the group channel
+      const result = await sdk.realtime.subscribe(channelName);
+      if (result.ok) {
+        realtimeSubscribed = channelName;
+        console.log(`[Realtime] Subscribed to ${channelName}`);
+
+        // Listen for incoming messages
+        sdk.realtime.on(`${channelName}:message`, (payload) => {
+          handleIncomingMessage(payload, groupId);
+        });
+      } else {
+        console.warn('[Realtime] Subscribe failed, falling back to polling');
+        startPolling(groupId);
+      }
+    } catch (err) {
+      console.warn('[Realtime] Connection failed, falling back to polling:', err.message);
+      startPolling(groupId);
+    }
+  }
+
+  function cleanupRealtime() {
+    // Unsubscribe from previous channel
+    if (realtimeSubscribed && window.insforge?.realtime) {
+      window.insforge.realtime.off(`${realtimeSubscribed}:message`);
+      window.insforge.realtime.unsubscribe(realtimeSubscribed);
+      realtimeSubscribed = null;
+    }
+
+    // Stop polling if active
+    if (pollingInterval) {
+      clearInterval(pollingInterval);
+      pollingInterval = null;
+    }
+  }
+
+  // ============ Fallback Polling ============
+  function startPolling(groupId) {
+    if (pollingInterval) clearInterval(pollingInterval);
+
+    let lastMessageCount = Store.getMessages(groupId).length;
+
+    pollingInterval = setInterval(() => {
+      // Only poll if we're still on the chat page and same group
+      if (selectedGroupId !== groupId) {
+        clearInterval(pollingInterval);
+        pollingInterval = null;
+        return;
+      }
+
+      const currentMessages = Store.getMessages(groupId);
+      if (currentMessages.length > lastMessageCount) {
+        const user = Store.getCurrentUser();
+        // Append only the new messages that aren't from us
+        const newMessages = currentMessages.slice(lastMessageCount);
+        newMessages.forEach(msg => {
+          if (msg.senderId !== user.id) {
+            appendBubble(msg);
+          }
+        });
+        lastMessageCount = currentMessages.length;
+        updateSidebarGroupItem(groupId);
+      }
+    }, 3000); // Poll every 3 seconds
+  }
+
+  // ============ Handle Incoming Realtime Message ============
+  function handleIncomingMessage(payload, groupId) {
+    if (!payload || !payload.id) return;
+
+    const user = Store.getCurrentUser();
+
+    // Don't process our own messages (we already appended them optimistically)
+    if (payload.senderId === user.id) return;
+
+    // Check if message is for the currently selected group
+    if (payload.groupId !== selectedGroupId) {
+      // Update sidebar unread indicator for other groups
+      updateSidebarGroupItem(payload.groupId);
+      return;
+    }
+
+    // Add to local store (if not already there)
+    const existing = Store.getMessages(groupId);
+    if (!existing.find(m => m.id === payload.id)) {
+      // Inject directly into localStorage without re-triggering DB write
+      const allMessages = JSON.parse(localStorage.getItem('siseminar_messages') || '[]');
+      allMessages.push(payload);
+      localStorage.setItem('siseminar_messages', JSON.stringify(allMessages));
+    }
+
+    // Append bubble to chat
+    appendBubble(payload);
+    updateSidebarGroupItem(groupId);
   }
 
   // ============ Empty State ============
@@ -143,9 +267,12 @@ const ChatPage = (() => {
             </h3>
             <span style="font-size: 12px; color: var(--outline);">${members.length} anggota</span>
           </div>
-          <button class="topbar-icon-btn" id="btnGroupInfo" title="Info Grup">
-            <span class="material-symbols-outlined">info</span>
-          </button>
+          <div class="flex items-center gap-2">
+            <span id="realtimeStatus" style="font-size: 10px; font-weight: 600; padding: 2px 8px; border-radius: 12px; ${realtimeSubscribed ? 'background: rgba(16,185,129,0.15); color: #10B981;' : 'background: rgba(239,68,68,0.1); color: #EF4444;'}">${realtimeSubscribed ? '● LIVE' : '○ POLLING'}</span>
+            <button class="topbar-icon-btn" id="btnGroupInfo" title="Info Grup">
+              <span class="material-symbols-outlined">info</span>
+            </button>
+          </div>
         </div>
 
         <div class="chat-messages" id="chatMessages">
@@ -254,7 +381,7 @@ const ChatPage = (() => {
     }
   }
 
-  // ============ Send Message ============
+  // ============ Send Message (Optimistic + Realtime Publish) ============
   function sendMessage() {
     const input = document.getElementById('chatInput');
     if (!input) return;
@@ -262,19 +389,57 @@ const ChatPage = (() => {
     const content = input.value.trim();
     if (!content || !selectedGroupId) return;
 
-    const msg = Store.addMessage({
-      groupId: selectedGroupId,
-      content,
-      type: 'text'
-    });
+    const user = Store.getCurrentUser();
 
-    // Append bubble without full re-render for performance
+    // 1. Build message object immediately (optimistic)
+    const msg = {
+      id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
+      groupId: selectedGroupId,
+      senderId: user.id,
+      senderName: user.name,
+      content,
+      type: 'text',
+      createdAt: new Date().toISOString()
+    };
+
+    // 2. Append bubble instantly (zero latency for sender)
     appendBubble(msg);
     input.value = '';
     input.focus();
 
-    // Update sidebar last message
+    // 3. Update sidebar last message immediately
     updateSidebarGroupItem(selectedGroupId);
+
+    // 4. Save to localStorage immediately
+    const allMessages = JSON.parse(localStorage.getItem('siseminar_messages') || '[]');
+    allMessages.push(msg);
+    localStorage.setItem('siseminar_messages', JSON.stringify(allMessages));
+
+    // 5. Fire-and-forget: sync to database + publish to realtime
+    (async () => {
+      try {
+        const sdk = window.insforge;
+        if (!sdk) return;
+
+        // Insert into database
+        await sdk.database.from('messages').insert([{
+          id: msg.id,
+          group_id: msg.groupId,
+          sender_id: msg.senderId,
+          sender_name: msg.senderName,
+          content: msg.content,
+          type: msg.type,
+          created_at: msg.createdAt
+        }]);
+
+        // Publish via realtime so other users get it instantly
+        if (sdk.realtime && sdk.realtime.isConnected) {
+          await sdk.realtime.publish(`chat:${selectedGroupId}`, 'message', msg);
+        }
+      } catch (err) {
+        console.warn('[Chat] Background sync error (message still saved locally):', err.message);
+      }
+    })();
   }
 
   function appendBubble(msg) {
@@ -285,12 +450,33 @@ const ChatPage = (() => {
     const emptyState = container.querySelector('.empty-state');
     if (emptyState) emptyState.remove();
 
+    // Check if bubble already exists (prevent duplicates)
+    if (container.querySelector(`[data-msg-id="${msg.id}"]`)) return;
+
     const user = Store.getCurrentUser();
-    const bubbleHtml = renderBubble(msg, user);
-    const wrapper = document.createElement('div');
-    wrapper.innerHTML = bubbleHtml;
-    const bubbleEl = wrapper.firstElementChild;
-    bubbleEl.classList.add('animate-slide-up');
+    const isSent = msg.senderId === user.id;
+    const isAnnouncement = msg.type === 'announcement';
+
+    let bubbleClass = 'chat-bubble';
+    if (isAnnouncement) bubbleClass += ' announcement';
+    else if (isSent) bubbleClass += ' sent';
+    else bubbleClass += ' received';
+
+    const senderLabel = isAnnouncement
+      ? `<div class="chat-bubble-sender">📢 ${escapeHtml(msg.senderName || 'Admin')}</div>`
+      : (!isSent ? `<div class="chat-bubble-sender">${escapeHtml(msg.senderName || 'Anonim')}</div>` : '');
+
+    const contentHtml = escapeHtml(msg.content).replace(/\n/g, '<br>');
+
+    const bubbleEl = document.createElement('div');
+    bubbleEl.className = bubbleClass + ' animate-slide-up';
+    bubbleEl.setAttribute('data-msg-id', msg.id);
+    bubbleEl.innerHTML = `
+      ${senderLabel}
+      <div>${contentHtml}</div>
+      <div class="chat-bubble-time">${App.formatTime(msg.createdAt)}</div>
+    `;
+
     container.appendChild(bubbleEl);
     scrollToBottom();
   }
@@ -351,16 +537,44 @@ const ChatPage = (() => {
             return;
           }
 
-          const msg = Store.addMessage({
+          const user = Store.getCurrentUser();
+          const msg = {
+            id: 'msg_' + Date.now() + '_' + Math.random().toString(36).substr(2, 6),
             groupId: selectedGroupId,
+            senderId: user.id,
+            senderName: user.name,
             content,
-            type: 'announcement'
-          });
+            type: 'announcement',
+            createdAt: new Date().toISOString()
+          };
+
+          // Save locally
+          const allMessages = JSON.parse(localStorage.getItem('siseminar_messages') || '[]');
+          allMessages.push(msg);
+          localStorage.setItem('siseminar_messages', JSON.stringify(allMessages));
 
           App.closeModal();
           appendBubble(msg);
           updateSidebarGroupItem(selectedGroupId);
           App.showToast('Pengumuman berhasil dikirim', 'success');
+
+          // Fire-and-forget: sync to DB + realtime
+          (async () => {
+            try {
+              const sdk = window.insforge;
+              if (!sdk) return;
+              await sdk.database.from('messages').insert([{
+                id: msg.id, group_id: msg.groupId, sender_id: msg.senderId,
+                sender_name: msg.senderName, content: msg.content,
+                type: msg.type, created_at: msg.createdAt
+              }]);
+              if (sdk.realtime?.isConnected) {
+                await sdk.realtime.publish(`chat:${selectedGroupId}`, 'message', msg);
+              }
+            } catch (err) {
+              console.warn('[Chat] Broadcast sync error:', err.message);
+            }
+          })();
         });
       }
     }, 100);
@@ -594,8 +808,14 @@ const ChatPage = (() => {
     return div.innerHTML;
   }
 
+  // ============ Cleanup on Page Leave ============
+  function destroy() {
+    cleanupRealtime();
+  }
+
   // ============ Public API ============
   return {
-    render
+    render,
+    destroy
   };
 })();

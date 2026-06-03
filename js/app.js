@@ -76,6 +76,11 @@ const App = (() => {
     const { route, params } = getRouteParams();
     const user = Store.getCurrentUser();
 
+    // Cleanup realtime subscriptions when leaving chat page
+    if (typeof ChatPage !== 'undefined' && ChatPage.destroy && currentRoute === 'chat' && route !== 'chat') {
+      ChatPage.destroy();
+    }
+
     // Public routes (no auth needed)
     if (route === 'login' || !route) {
       if (user) {
