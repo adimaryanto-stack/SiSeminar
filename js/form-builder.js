@@ -1,6 +1,7 @@
 /* ============================================================
    SiSeminar — form-builder.js
    Registration Form Builder Page Module (Admin Panel)
+   Redesigned to match builder_form_registrasi reference design
    ============================================================ */
 
 const FormBuilderPage = (() => {
@@ -26,114 +27,132 @@ const FormBuilderPage = (() => {
 
     fieldsCache = selectedEventId ? Store.getFormFields(selectedEventId) : [];
 
+    const selectedEvent = selectedEventId ? Store.getEventById(selectedEventId) : null;
+    const eventTitle = selectedEvent ? escapeHtml(selectedEvent.title) : 'Pilih Event';
+
     const eventOptions = events.map(e =>
       `<option value="${e.id}" ${e.id === selectedEventId ? 'selected' : ''}>${escapeHtml(e.title)}</option>`
     ).join('');
 
     container.innerHTML = `
-      <div class="animate-fade-in">
-        <!-- Page Header -->
-        <div class="flex items-center justify-between mb-6 wrap gap-4">
+      <div class="animate-fade-in" style="padding-bottom: var(--space-10);">
+        <!-- Page Header Section -->
+        <div class="flex justify-between items-end mb-8 flex-wrap gap-4">
           <div>
-            <h1 class="page-title">Pembuat Form Registrasi</h1>
-            <div class="breadcrumbs">
-              <span>Dashboard</span>
-              <span class="separator">/</span>
-              <span class="active">Form Builder</span>
-            </div>
+            <nav class="flex items-center gap-2 text-[12px] font-medium text-outline mb-1">
+              <span>Management</span>
+              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span class="text-primary font-bold">Form Builder</span>
+            </nav>
+            <h2 class="font-bold text-3xl font-heading text-on-surface" style="margin: 0;">Registration Form Builder</h2>
+            <p class="text-on-surface-variant text-[14px] mt-1 max-w-2xl" style="margin: 0;">Desain form pendaftaran kustom untuk event <strong class="text-primary">"${eventTitle}"</strong>. Tambahkan, atur ulang, dan preview form yang akan dilihat peserta.</p>
           </div>
-          <div class="flex items-center gap-3">
-            <select class="form-select" id="builderEventSelect" style="width: 200px;">
+          <div class="flex items-center gap-3 flex-wrap">
+            <select class="bg-surface-container-low border border-border-subtle rounded-xl px-4 py-2.5 text-[13px] font-semibold text-on-surface focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all cursor-pointer" id="builderEventSelect" style="min-width: 200px;">
               <option value="">Pilih Event...</option>
               ${eventOptions}
             </select>
-            <button class="btn btn-secondary" id="btnLivePreview" ${!selectedEventId ? 'disabled' : ''}>
-              <span class="material-symbols-outlined">visibility</span>
-              Live Link
+            <button class="px-4 py-2.5 border border-primary text-primary rounded-xl font-bold text-[13px] flex items-center gap-2 bg-transparent hover:bg-surface-container-low transition-colors cursor-pointer" id="btnLivePreview" ${!selectedEventId ? 'disabled' : ''} style="${!selectedEventId ? 'opacity:0.5;cursor:not-allowed;' : ''}">
+              <span class="material-symbols-outlined text-[18px]">visibility</span>
+              Live Preview
             </button>
-            <button class="btn btn-primary" id="btnSaveForm" ${!selectedEventId ? 'disabled' : ''}>
-              <span class="material-symbols-outlined">save</span>
-              Simpan Form
-            </button>
-            <button class="btn btn-ghost" id="btnDeleteWholeForm" ${!selectedEventId ? 'disabled' : ''} style="color: var(--destructive-red); border: 1px solid var(--border-subtle);">
-              <span class="material-symbols-outlined" style="font-size: 20px;">delete_sweep</span>
-              Hapus Form
+            <button class="px-4 py-2.5 bg-teal-accent hover:bg-secondary text-white rounded-xl font-bold text-[13px] flex items-center gap-2 border-0 cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-95" id="btnSaveForm" ${!selectedEventId ? 'disabled' : ''} style="${!selectedEventId ? 'opacity:0.5;cursor:not-allowed;' : ''}">
+              <span class="material-symbols-outlined text-[18px]">publish</span>
+              Publish Changes
             </button>
           </div>
         </div>
 
         ${!selectedEventId ? `
-          <div class="empty-state">
-            <span class="material-symbols-outlined" style="font-size: 56px;">dynamic_form</span>
-            <h3>Pilih Event Terlebih Dahulu</h3>
-            <p>Silakan pilih salah satu event aktif dari dropdown di atas untuk mulai membuat form pendaftaran.</p>
+          <div class="bg-surface-container-lowest border border-border-subtle rounded-xl p-16 flex flex-col items-center justify-center text-center" style="min-height: 400px;">
+            <div class="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-6">
+              <span class="material-symbols-outlined text-primary" style="font-size: 36px;">dynamic_form</span>
+            </div>
+            <h3 class="font-bold text-xl font-heading text-on-surface mb-2">Pilih Event Terlebih Dahulu</h3>
+            <p class="text-on-surface-variant text-[14px] max-w-md">Silakan pilih salah satu event aktif dari dropdown di atas untuk mulai membuat form pendaftaran.</p>
           </div>
         ` : `
-          <!-- Two-column Layout -->
-          <div style="display: grid; grid-template-columns: 1.2fr 0.8fr; gap: var(--space-6); align-items: start;">
+          <!-- Workspace Grid: 12-col Layout -->
+          <div class="grid grid-cols-12 gap-6" style="align-items: start;">
             
-            <!-- LEFT COLUMN: Form Elements & Editor -->
-            <div class="flex flex-col gap-6">
-              <!-- Add Field Block -->
-              <div class="card" style="padding: var(--space-5);">
-                <h4 style="font-family: var(--font-heading); font-size: 15px; font-weight: 600; margin-bottom: var(--space-4); color: var(--primary);">
-                  + Tambah Field Baru
-                </h4>
-                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: var(--space-3);" class="field-type-grid">
-                  <button class="btn btn-ghost btn-add-field" data-type="text" style="flex-direction: column; height: 74px; gap: 4px; border: 1px dashed var(--border-subtle);">
-                    <span class="material-symbols-outlined text-primary" style="font-size: 24px;">match_case</span>
-                    <span style="font-size: 11px; font-weight: 600;">Input Teks</span>
+            <!-- LEFT COLUMN: Field Library & Builder (col-span-7) -->
+            <div class="col-span-12 xl:col-span-7 flex flex-col gap-6">
+              
+              <!-- Add New Field Block -->
+              <div class="bg-surface-container-lowest border border-border-subtle rounded-xl p-6">
+                <h3 class="text-[11px] font-bold text-on-surface uppercase tracking-widest mb-4">Add New Field</h3>
+                <div class="grid grid-cols-4 gap-4">
+                  <button class="flex flex-col items-center justify-center gap-2 p-4 border border-dashed border-border-subtle rounded-xl bg-transparent hover:border-teal-accent hover:bg-surface-container-low transition-all cursor-pointer group btn-add-field" data-type="text" style="min-height: 80px;">
+                    <span class="material-symbols-outlined text-outline group-hover:text-teal-accent transition-colors" style="font-size: 24px;">text_fields</span>
+                    <span class="text-[12px] font-semibold text-on-surface-variant">Text</span>
                   </button>
-                  <button class="btn btn-ghost btn-add-field" data-type="number" style="flex-direction: column; height: 74px; gap: 4px; border: 1px dashed var(--border-subtle);">
-                    <span class="material-symbols-outlined text-teal" style="font-size: 24px;">pin</span>
-                    <span style="font-size: 11px; font-weight: 600;">Input Angka</span>
+                  <button class="flex flex-col items-center justify-center gap-2 p-4 border border-dashed border-border-subtle rounded-xl bg-transparent hover:border-teal-accent hover:bg-surface-container-low transition-all cursor-pointer group btn-add-field" data-type="number" style="min-height: 80px;">
+                    <span class="material-symbols-outlined text-outline group-hover:text-teal-accent transition-colors" style="font-size: 24px;">pin</span>
+                    <span class="text-[12px] font-semibold text-on-surface-variant">Number</span>
                   </button>
-                  <button class="btn btn-ghost btn-add-field" data-type="dropdown" style="flex-direction: column; height: 74px; gap: 4px; border: 1px dashed var(--border-subtle);">
-                    <span class="material-symbols-outlined text-purple" style="font-size: 24px;">list</span>
-                    <span style="font-size: 11px; font-weight: 600;">Pilihan Berganda</span>
+                  <button class="flex flex-col items-center justify-center gap-2 p-4 border border-dashed border-border-subtle rounded-xl bg-transparent hover:border-teal-accent hover:bg-surface-container-low transition-all cursor-pointer group btn-add-field" data-type="dropdown" style="min-height: 80px;">
+                    <span class="material-symbols-outlined text-outline group-hover:text-teal-accent transition-colors" style="font-size: 24px;">arrow_drop_down_circle</span>
+                    <span class="text-[12px] font-semibold text-on-surface-variant">Dropdown</span>
                   </button>
-                  <button class="btn btn-ghost btn-add-field" data-type="checkbox" style="flex-direction: column; height: 74px; gap: 4px; border: 1px dashed var(--border-subtle);">
-                    <span class="material-symbols-outlined text-amber" style="font-size: 24px;">check_box</span>
-                    <span style="font-size: 11px; font-weight: 600;">Kotak Persetujuan</span>
+                  <button class="flex flex-col items-center justify-center gap-2 p-4 border border-dashed border-border-subtle rounded-xl bg-transparent hover:border-teal-accent hover:bg-surface-container-low transition-all cursor-pointer group btn-add-field" data-type="checkbox" style="min-height: 80px;">
+                    <span class="material-symbols-outlined text-outline group-hover:text-teal-accent transition-colors" style="font-size: 24px;">check_box</span>
+                    <span class="text-[12px] font-semibold text-on-surface-variant">Checkbox</span>
                   </button>
                 </div>
               </div>
 
               <!-- Form Structure Block -->
               <div>
-                <h4 style="font-family: var(--font-heading); font-size: 15px; font-weight: 600; margin-bottom: var(--space-4); display: flex; justify-content: space-between; align-items: center;">
-                  <span>Struktur Form</span>
-                  <span class="chip chip-info" style="font-size: 11px;">${fieldsCache.length} Fields</span>
-                </h4>
+                <div class="flex items-center justify-between mb-4">
+                  <h3 class="font-bold text-xl font-heading text-primary" style="margin: 0;">Form Structure</h3>
+                  <span class="bg-surface-container-high text-on-surface-variant px-3 py-1 rounded-full text-[11px] font-semibold">${fieldsCache.length} Fields Configured</span>
+                </div>
 
-                <div id="fieldsContainer" class="flex flex-col gap-3">
+                <div id="fieldsContainer" class="flex flex-col gap-4">
                   ${fieldsCache.length === 0 ? `
-                    <div style="border: 2px dashed var(--border-subtle); padding: var(--space-8); text-align: center; border-radius: var(--radius-md); background: var(--surface-container-low);" class="add-field-zone">
-                      <span class="material-symbols-outlined" style="font-size: 36px; color: var(--outline);">drag_click</span>
-                      <p style="font-size: 13px; color: var(--outline); margin-top: 4px;">Klik salah satu tipe input di atas untuk menyusun form</p>
+                    <div class="border-2 border-dashed border-border-subtle rounded-xl py-8 flex flex-col items-center justify-center text-on-surface-variant cursor-pointer hover:bg-surface-container-low hover:border-primary transition-all" style="opacity: 0.6;">
+                      <span class="material-symbols-outlined mb-2" style="font-size: 36px;">add_circle</span>
+                      <p class="text-[13px] font-semibold">Click to add more fields</p>
                     </div>
                   ` : fieldsCache.map((field, idx) => renderFieldCard(field, idx)).join('')}
                 </div>
+
+                ${fieldsCache.length > 0 ? `
+                  <!-- Delete Whole Form Action -->
+                  <div class="mt-6 flex justify-end">
+                    <button class="px-4 py-2 border border-destructive-red/30 text-destructive-red rounded-xl text-[12px] font-semibold bg-transparent hover:bg-destructive-red/5 transition-colors cursor-pointer flex items-center gap-2" id="btnDeleteWholeForm">
+                      <span class="material-symbols-outlined text-[16px]">delete_sweep</span>
+                      Hapus Semua Field Kustom
+                    </button>
+                  </div>
+                ` : ''}
               </div>
             </div>
 
-            <!-- RIGHT COLUMN: Realtime Participant Preview -->
-            <div class="card" style="position: sticky; top: 90px; overflow: hidden; box-shadow: var(--shadow-lg);">
-              <div style="background: linear-gradient(135deg, var(--primary), var(--primary-container)); color: white; padding: var(--space-4) var(--space-5); display: flex; justify-content: space-between; align-items: center;">
-                <div class="flex items-center gap-2">
-                  <span class="material-symbols-outlined text-teal" style="font-size: 20px;">preview</span>
-                  <span style="font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em;">TAMPILAN PESERTA / Preview</span>
+            <!-- RIGHT COLUMN: Live Preview Pane (col-span-5) -->
+            <div class="col-span-12 xl:col-span-5">
+              <div class="bg-surface-container-lowest border border-border-subtle rounded-2xl shadow-sm overflow-hidden flex flex-col" style="position: sticky; top: 90px; max-height: 700px;">
+                <!-- Preview Header -->
+                <div class="bg-primary p-6 text-white">
+                  <div class="flex items-center gap-2 mb-2">
+                    <span class="material-symbols-outlined text-[18px]" style="opacity: 0.8;">devices</span>
+                    <span class="text-[11px] uppercase tracking-widest font-semibold" style="opacity: 0.8;">Participant View Preview</span>
+                  </div>
+                  <h4 class="font-bold text-lg" style="margin: 0;">Seminar Registration</h4>
                 </div>
-                <span class="chip chip-success" style="font-size: 10px; background: rgba(16,185,129,0.2); border: 1px solid rgba(16,185,129,0.4);">LIVE</span>
-              </div>
-              <div style="padding: var(--space-6); background: var(--surface-container-lowest); max-height: 70vh; overflow-y: auto;">
-                <div id="previewFormContent" class="flex flex-col gap-4">
-                  ${renderFormPreview()}
+                
+                <!-- Preview Content -->
+                <div class="p-8 flex-grow overflow-y-auto bg-surface-container-lowest" id="previewFormContent" style="scrollbar-width: thin;">
+                  <div class="flex flex-col gap-6">
+                    ${renderFormPreview()}
+                  </div>
+                  <button class="w-full py-4 bg-primary text-white rounded-xl font-bold text-[16px] shadow-md mt-8 border-0 cursor-not-allowed" style="opacity: 0.5;" disabled>
+                    Register Now
+                  </button>
+                  <p class="text-center text-[13px] text-on-surface-variant mt-4" style="opacity: 0.6;">
+                    Already registered? <a class="text-primary font-semibold" href="#" style="text-decoration: none;">Check Status</a>
+                  </p>
                 </div>
-                <button class="btn btn-primary btn-lg mt-6" style="width: 100%; justify-content: center;" disabled>
-                  Selesaikan Pendaftaran
-                  <span class="material-symbols-outlined" style="font-size: 18px;">arrow_forward</span>
-                </button>
               </div>
             </div>
 
@@ -150,81 +169,83 @@ const FormBuilderPage = (() => {
     const isProtected = ['nama lengkap', 'nomor whatsapp'].includes(field.label.toLowerCase());
 
     const typeLabels = {
-      text: '<span class="chip chip-info" style="font-size: 10px; padding: 2px 8px;">Teks</span>',
-      number: '<span class="chip chip-success" style="font-size: 10px; padding: 2px 8px;">Angka</span>',
-      dropdown: '<span class="chip chip-warning" style="font-size: 10px; padding: 2px 8px;">Pilihan</span>',
-      checkbox: '<span class="chip chip-danger" style="font-size: 10px; padding: 2px 8px;">Persetujuan</span>'
+      text: `<span class="bg-primary/10 text-primary px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide">Short Text</span>`,
+      number: `<span class="bg-teal-accent/10 text-teal-accent px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide">Number</span>`,
+      dropdown: `<span class="bg-amber-500/10 text-amber-600 px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide">Dropdown</span>`,
+      checkbox: `<span class="bg-purple-500/10 text-purple-600 px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wide">Checkbox</span>`
     };
 
+    const requiredBadge = isProtected 
+      ? `<span class="text-[10px] text-outline font-medium">(Required)</span>`
+      : '';
+
     return `
-      <div class="card field-card animate-slide-up" 
+      <div class="group bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden flex items-start gap-4 hover:border-primary transition-all relative field-card animate-slide-up" 
            draggable="true" 
            data-id="${field.id}" 
-           data-idx="${idx}" 
-           style="background: var(--surface-container-lowest); border-left: 4px solid var(--primary); display: flex; flex-direction: column; cursor: grab;"
-           onmouseover="this.style.borderColor='var(--teal-accent)'"
-           onmouseout="this.style.borderColor='var(--primary)'">
+           data-idx="${idx}"
+           style="cursor: grab; animation-delay: ${idx * 0.03}s;">
         
-        <div style="display: flex; align-items: flex-start; gap: var(--space-4); padding: var(--space-4);">
-          <!-- Drag Handle -->
-          <div style="color: var(--outline); padding-top: 10px; cursor: move;" class="drag-handle">
-            <span class="material-symbols-outlined">drag_indicator</span>
-          </div>
+        <!-- Left Accent Bar -->
+        <div class="absolute left-0 top-0 bottom-0 w-1 bg-primary group-hover:bg-teal-accent transition-colors"></div>
+        
+        <!-- Drag Handle -->
+        <div class="mt-5 ml-4 text-outline cursor-move drag-handle" style="opacity: 0.4;">
+          <span class="material-symbols-outlined">drag_indicator</span>
+        </div>
 
-          <!-- Content Form Editor -->
-          <div style="flex: 1;" class="flex flex-col gap-3">
-            <div class="flex items-center justify-between wrap gap-2">
-              <div class="flex items-center gap-2">
-                ${typeLabels[field.fieldType] || typeLabels.text}
-                ${isProtected ? '<span style="font-size: 10px; color: var(--outline); font-weight: 500;">(Field Wajib Sistem)</span>' : ''}
-              </div>
-              <div class="flex items-center gap-4">
-                <!-- Required Toggle -->
-                <label class="checkbox-wrapper" style="font-size: 13px; font-weight: 500;">
-                  <input type="checkbox" class="field-required-toggle" data-id="${field.id}" ${field.isRequired ? 'checked' : ''} ${isProtected ? 'disabled' : ''}>
-                  Wajib Diisi
-                </label>
-                
-                <!-- Delete Button -->
-                ${!isProtected ? `
-                  <button class="topbar-icon-btn text-danger btn-delete-field" data-id="${field.id}" title="Hapus Field" style="color: var(--destructive-red);">
-                    <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
-                  </button>
-                ` : ''}
-              </div>
-            </div>
-
-            <!-- Label Input -->
-            <div class="form-group">
-              <input type="text" class="form-input field-label-input" 
+        <!-- Field Content -->
+        <div class="flex-grow py-5 pr-4">
+          <div class="grid grid-cols-2 gap-4">
+            <div>
+              <label class="block text-[12px] font-semibold text-on-surface-variant uppercase tracking-wide mb-1">Field Label</label>
+              <input type="text" 
+                     class="w-full border border-border-subtle rounded-lg text-[14px] font-medium h-10 px-3 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all field-label-input" 
                      data-id="${field.id}" 
                      value="${escapeHtml(field.label)}" 
-                     placeholder="Nama label input..." 
-                     ${isProtected ? 'readonly' : ''}
-                     style="height: 38px; font-weight: 500; font-size: 14px;">
+                     placeholder="Enter label..." 
+                     ${isProtected ? 'readonly style="background: var(--surface-container-low); cursor: default;"' : ''}>
             </div>
-
-            <!-- Custom Options Editors -->
-            ${field.fieldType === 'dropdown' ? `
-              <div class="form-group mt-2">
-                <label class="form-label" style="font-size: 12px; color: var(--outline);">Pilihan Menu Dropdown (Pisahkan dengan Koma):</label>
-                <input type="text" class="form-input field-options-input" 
-                       data-id="${field.id}" 
-                       value="${escapeHtml(field.options.join(', '))}" 
-                       placeholder="Contoh: Pilihan A, Pilihan B, Pilihan C"
-                       style="height: 34px; font-size: 13px;">
+            <div>
+              <label class="block text-[12px] font-semibold text-on-surface-variant uppercase tracking-wide mb-1">Type</label>
+              <div class="h-10 px-3 bg-surface-container-low rounded-lg flex items-center text-[14px] text-on-surface gap-2">
+                ${typeLabels[field.fieldType] || typeLabels.text}
+                ${requiredBadge}
               </div>
-            ` : ''}
+            </div>
+          </div>
 
-            ${field.fieldType === 'checkbox' ? `
-              <div class="form-group mt-2">
-                <label class="form-label" style="font-size: 12px; color: var(--outline);">Klausa Pernyataan Persetujuan:</label>
-                <textarea class="form-input field-placeholder-input" 
-                          data-id="${field.id}" 
-                          rows="2"
-                          placeholder="Masukkan klausul persetujuan peserta..."
-                          style="font-size: 13px; line-height: 1.4;">${escapeHtml(field.placeholder)}</textarea>
-              </div>
+          ${field.fieldType === 'dropdown' ? `
+            <div class="mt-3">
+              <label class="block text-[12px] font-semibold text-on-surface-variant uppercase tracking-wide mb-1">Pilihan Dropdown (Pisahkan dengan Koma)</label>
+              <input type="text" 
+                     class="w-full border border-border-subtle rounded-lg text-[13px] h-10 px-3 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all field-options-input" 
+                     data-id="${field.id}" 
+                     value="${escapeHtml(field.options.join(', '))}" 
+                     placeholder="Pilihan A, Pilihan B, Pilihan C">
+            </div>
+          ` : ''}
+
+          ${field.fieldType === 'checkbox' ? `
+            <div class="mt-3">
+              <label class="block text-[12px] font-semibold text-on-surface-variant uppercase tracking-wide mb-1">Consent Clause Description</label>
+              <textarea class="w-full border border-border-subtle rounded-lg text-[13px] p-3 focus:border-primary focus:ring-1 focus:ring-primary/30 transition-all field-placeholder-input" 
+                        data-id="${field.id}" 
+                        rows="2"
+                        placeholder="Masukkan klausul persetujuan peserta...">${escapeHtml(field.placeholder)}</textarea>
+            </div>
+          ` : ''}
+
+          <!-- Toggle & Actions Row -->
+          <div class="flex items-center justify-between mt-3 pt-3 border-t border-border-subtle/50">
+            <label class="flex items-center gap-2 cursor-pointer text-[12px] font-semibold text-on-surface-variant">
+              <input type="checkbox" class="w-4 h-4 rounded border-border-subtle text-teal-accent focus:ring-teal-accent field-required-toggle" data-id="${field.id}" ${field.isRequired ? 'checked' : ''} ${isProtected ? 'disabled' : ''}>
+              Wajib Diisi
+            </label>
+            ${!isProtected ? `
+              <button class="p-2 text-outline hover:text-destructive-red transition-colors bg-transparent border-0 cursor-pointer rounded-lg hover:bg-destructive-red/5 btn-delete-field" data-id="${field.id}" title="Hapus Field">
+                <span class="material-symbols-outlined text-[20px]">delete</span>
+              </button>
             ` : ''}
           </div>
         </div>
@@ -236,48 +257,73 @@ const FormBuilderPage = (() => {
   function renderFormPreview() {
     if (fieldsCache.length === 0) {
       return `
-        <div style="text-align: center; color: var(--outline); padding: var(--space-8);">
-          <span class="material-symbols-outlined" style="font-size: 32px;">assignment</span>
-          <p style="font-size: 13px; margin-top: 4px;">Form kosong, silakan tambah field</p>
+        <div class="text-center py-12" style="opacity: 0.5;">
+          <span class="material-symbols-outlined mb-2" style="font-size: 36px; color: var(--outline);">assignment</span>
+          <p class="text-[13px] text-on-surface-variant font-medium">Form kosong, silakan tambah field</p>
         </div>
       `;
     }
 
     return fieldsCache.map(field => {
-      const isRequiredText = field.isRequired ? '<span class="required">*</span>' : '';
+      const requiredMark = field.isRequired ? '<span class="text-destructive-red">*</span>' : '';
 
-      let inputHtml = '';
       if (field.fieldType === 'text') {
-        inputHtml = `<input type="text" class="form-input" placeholder="${escapeHtml(field.placeholder || 'Masukkan teks...')}" disabled>`;
-      } else if (field.fieldType === 'number') {
-        inputHtml = `<input type="number" class="form-input" placeholder="${escapeHtml(field.placeholder || 'Masukkan angka...')}" disabled>`;
-      } else if (field.fieldType === 'dropdown') {
-        const opts = field.options.length > 0 ? field.options : ['Pilihan 1', 'Pilihan 2'];
-        inputHtml = `
-          <select class="form-select" disabled>
-            <option value="">${escapeHtml(field.placeholder || 'Pilih salah satu...')}</option>
-            ${opts.map(o => `<option>${escapeHtml(o)}</option>`).join('')}
-          </select>
-        `;
-      } else if (field.fieldType === 'checkbox') {
         return `
-          <div class="consent-box" style="padding: var(--space-3); background: var(--surface-container-low); border-radius: var(--radius-md); border: 1px solid var(--border-subtle);">
-            <label class="checkbox-wrapper" style="align-items: flex-start;">
-              <input type="checkbox" disabled style="width: 20px; height: 20px; accent-color: var(--teal-accent);">
-              <span class="checkbox-label" style="font-size: 12px; line-height: 1.4; color: var(--on-surface-variant);">
-                ${escapeHtml(field.placeholder || 'Saya setuju dengan ketentuan yang berlaku.')} ${isRequiredText}
-              </span>
-            </label>
+          <div>
+            <label class="block text-[13px] font-semibold text-on-surface mb-2">${escapeHtml(field.label)} ${requiredMark}</label>
+            <input type="text" class="w-full border border-border-subtle rounded-lg text-[13px] h-10 bg-white px-3" placeholder="${escapeHtml(field.placeholder || 'e.g. Masukkan teks...')}" disabled>
           </div>
         `;
       }
 
-      return `
-        <div class="form-group">
-          <label class="form-label">${escapeHtml(field.label)} ${isRequiredText}</label>
-          ${inputHtml}
-        </div>
-      `;
+      if (field.fieldType === 'number') {
+        const isPhone = field.label.toLowerCase().includes('whatsapp') || field.label.toLowerCase().includes('telepon');
+        if (isPhone) {
+          return `
+            <div>
+              <label class="block text-[13px] font-semibold text-on-surface mb-2">${escapeHtml(field.label)} ${requiredMark}</label>
+              <div class="relative">
+                <div class="absolute left-3 top-1/2 -translate-y-1/2 text-[13px] text-on-surface-variant border-r border-border-subtle pr-2">+62</div>
+                <input type="text" class="w-full border border-border-subtle rounded-lg text-[13px] h-10 pl-14 bg-white" placeholder="812-3456-7890" disabled>
+              </div>
+            </div>
+          `;
+        }
+        return `
+          <div>
+            <label class="block text-[13px] font-semibold text-on-surface mb-2">${escapeHtml(field.label)} ${requiredMark}</label>
+            <input type="number" class="w-full border border-border-subtle rounded-lg text-[13px] h-10 bg-white px-3" placeholder="${escapeHtml(field.placeholder || 'Masukkan angka...')}" disabled>
+          </div>
+        `;
+      }
+
+      if (field.fieldType === 'dropdown') {
+        const opts = field.options.length > 0 ? field.options : ['Pilihan 1', 'Pilihan 2'];
+        return `
+          <div>
+            <label class="block text-[13px] font-semibold text-on-surface mb-2">${escapeHtml(field.label)} ${requiredMark}</label>
+            <select class="w-full border border-border-subtle rounded-lg text-[13px] h-10 bg-white px-3" disabled>
+              <option value="">${escapeHtml(field.placeholder || 'Pilih salah satu...')}</option>
+              ${opts.map(o => `<option>${escapeHtml(o)}</option>`).join('')}
+            </select>
+          </div>
+        `;
+      }
+
+      if (field.fieldType === 'checkbox') {
+        return `
+          <div class="flex items-start gap-4 p-4 bg-surface-container-low rounded-xl border border-border-subtle">
+            <input type="checkbox" class="w-5 h-5 rounded border-border-subtle text-teal-accent focus:ring-teal-accent mt-0.5" disabled>
+            <div class="text-[13px] text-on-surface">
+              <span class="font-bold block mb-1">${escapeHtml(field.label)}</span>
+              ${escapeHtml(field.placeholder || 'Saya setuju dengan ketentuan yang berlaku.')} ${requiredMark}
+              <a class="text-teal-accent underline ml-1" href="#" style="font-size: 12px;">Read full policy.</a>
+            </div>
+          </div>
+        `;
+      }
+
+      return '';
     }).join('');
   }
 
@@ -441,6 +487,7 @@ const FormBuilderPage = (() => {
     dragEl = this;
     e.dataTransfer.effectAllowed = 'move';
     this.style.opacity = '0.4';
+    this.style.transform = 'scale(0.98)';
   }
 
   function handleDragOver(e) {
@@ -473,6 +520,7 @@ const FormBuilderPage = (() => {
 
   function handleDragEnd() {
     this.style.opacity = '1';
+    this.style.transform = 'scale(1)';
     dragEl = null;
   }
 
@@ -481,7 +529,17 @@ const FormBuilderPage = (() => {
     fieldsCache = Store.getFormFields(selectedEventId);
     const container = document.getElementById('previewFormContent');
     if (container) {
-      container.innerHTML = renderFormPreview();
+      container.innerHTML = `
+        <div class="flex flex-col gap-6">
+          ${renderFormPreview()}
+        </div>
+        <button class="w-full py-4 bg-primary text-white rounded-xl font-bold text-[16px] shadow-md mt-8 border-0 cursor-not-allowed" style="opacity: 0.5;" disabled>
+          Register Now
+        </button>
+        <p class="text-center text-[13px] text-on-surface-variant mt-4" style="opacity: 0.6;">
+          Already registered? <a class="text-primary font-semibold" href="#" style="text-decoration: none;">Check Status</a>
+        </p>
+      `;
     }
   }
 

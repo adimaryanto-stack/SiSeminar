@@ -17,102 +17,115 @@ const EventsPage = (() => {
     const stats = calculateStats();
 
     container.innerHTML = `
-      <div class="animate-fade-in">
+      <div class="animate-fade-in" style="padding-bottom: var(--space-10);">
         <!-- Page Header -->
-        <div class="flex items-center justify-between mb-8">
+        <div class="flex justify-between items-end mb-8 flex-wrap gap-4">
           <div>
-            <h1 class="page-title">Manajemen Event</h1>
-            <div class="breadcrumbs">
-              <span>Dashboard</span>
-              <span class="separator">/</span>
-              <span class="active">Event</span>
-            </div>
+            <nav class="flex items-center gap-2 text-[12px] font-medium text-outline mb-1">
+              <span>Management</span>
+              <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+              <span class="text-primary font-bold">Events</span>
+            </nav>
+            <h2 class="font-bold text-3xl font-heading text-on-surface" style="margin: 0;">Manajemen Event</h2>
+            <p class="text-on-surface-variant text-[14px] mt-1" style="margin: 0;">Kelola, pantau, dan organisasikan semua event seminar & webinar Anda.</p>
           </div>
-          <button class="btn btn-primary" id="btnCreateEvent">
+          <button class="bg-teal-accent hover:bg-secondary text-white px-5 py-3 rounded-xl font-bold flex items-center gap-2 border-0 cursor-pointer shadow-sm hover:shadow-md transition-all active:scale-95" id="btnCreateEvent">
             <span class="material-symbols-outlined">add</span>
-            Event Baru
+            Create New Event
           </button>
         </div>
 
-        <!-- Stats Grid -->
-        <div class="stats-grid">
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <span class="stat-card-label">Seminar Aktif</span>
-              <span class="material-symbols-outlined text-primary" style="font-size: 24px;">campaign</span>
+        <!-- Dashboard Stats Summary -->
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10" style="grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));">
+          <div class="bg-surface-container-lowest p-6 rounded-xl border border-border-subtle flex flex-col justify-between" style="transition: transform 0.2s, box-shadow 0.2s;">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-on-surface-variant font-semibold text-[12px] uppercase tracking-wider">Seminar & Webinar Aktif</span>
+              <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined" style="font-size: 20px;">calendar_today</span>
+              </div>
             </div>
-            <div class="stat-card-value">${stats.activeEvents}</div>
-            <div class="stat-card-desc">Dari total ${stats.totalEvents} event</div>
+            <div class="text-3xl font-bold font-heading text-on-surface">${stats.activeEvents}</div>
+            <div class="mt-2 text-outline text-[12px]">Dari total ${stats.totalEvents} event terdaftar</div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <span class="stat-card-label">Total Peserta</span>
-              <span class="material-symbols-outlined text-teal" style="font-size: 24px;">group</span>
+          <div class="bg-surface-container-lowest p-6 rounded-xl border border-border-subtle flex flex-col justify-between" style="transition: transform 0.2s, box-shadow 0.2s;">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-on-surface-variant font-semibold text-[12px] uppercase tracking-wider">Total Peserta Terdaftar</span>
+              <div class="w-8 h-8 bg-secondary/15 rounded-lg flex items-center justify-center text-secondary">
+                <span class="material-symbols-outlined" style="font-size: 20px;">groups</span>
+              </div>
             </div>
-            <div class="stat-card-value">${stats.totalParticipants}</div>
-            <div class="stat-card-desc">Peserta terdaftar aktif</div>
+            <div class="text-3xl font-bold font-heading text-on-surface">${stats.totalParticipants.toLocaleString()}</div>
+            <div class="mt-2 text-success-green text-[12px] font-semibold flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">trending_up</span>
+              Aktif berpartisipasi
+            </div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <span class="stat-card-label">Rata-rata Kehadiran</span>
-              <span class="material-symbols-outlined text-purple" style="font-size: 24px;">check_circle</span>
+          <div class="bg-surface-container-lowest p-6 rounded-xl border border-border-subtle flex flex-col justify-between" style="transition: transform 0.2s, box-shadow 0.2s;">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-on-surface-variant font-semibold text-[12px] uppercase tracking-wider">Avg. Engagement</span>
+              <div class="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center text-primary">
+                <span class="material-symbols-outlined" style="font-size: 20px;">bar_chart</span>
+              </div>
             </div>
-            <div class="stat-card-value">${stats.avgAttendance}%</div>
-            <div class="stat-card-desc">Tingkat kehadiran presensi</div>
+            <div class="text-3xl font-bold font-heading text-on-surface">${stats.avgAttendance}%</div>
+            <div class="mt-2 text-outline text-[12px]">Tingkat kehadiran presensi</div>
           </div>
 
-          <div class="stat-card">
-            <div class="stat-card-header">
-              <span class="stat-card-label">Event Mendatang</span>
-              <span class="material-symbols-outlined text-amber" style="font-size: 24px;">event_upcoming</span>
+          <div class="bg-surface-container-lowest p-6 rounded-xl border border-border-subtle flex flex-col justify-between" style="transition: transform 0.2s, box-shadow 0.2s;">
+            <div class="flex items-center justify-between mb-4">
+              <span class="text-on-surface-variant font-semibold text-[12px] uppercase tracking-wider">Event Mendatang</span>
+              <div class="w-8 h-8 bg-success-green/10 rounded-lg flex items-center justify-center text-success-green">
+                <span class="material-symbols-outlined" style="font-size: 20px;">event_upcoming</span>
+              </div>
             </div>
-            <div class="stat-card-value">${stats.upcomingEvents}</div>
-            <div class="stat-card-desc">Menunggu pelaksanaan</div>
+            <div class="text-3xl font-bold font-heading text-on-surface">${stats.upcomingEvents}</div>
+            <div class="mt-2 text-outline text-[12px]">Menunggu pelaksanaan</div>
           </div>
         </div>
 
-        <!-- Filter & Sort Bar -->
-        <div class="filter-bar mb-6">
-          <div class="flex items-center gap-3 wrap">
-            <span class="filter-label flex items-center gap-1">
-              <span class="material-symbols-outlined" style="font-size: 18px;">filter_list</span>
-              Filter Status:
-            </span>
-            <button class="chip ${currentFilter === 'all' ? 'active' : ''}" data-filter="all">Semua</button>
-            <button class="chip ${currentFilter === 'active' ? 'active' : ''}" data-filter="active">Aktif</button>
-            <button class="chip ${currentFilter === 'draft' ? 'active' : ''}" data-filter="draft">Draft</button>
-          </div>
+        <!-- Filters Bar -->
+        <div class="flex items-center justify-between mb-8 flex-wrap gap-4">
           <div class="flex items-center gap-3">
-            <span class="filter-label flex items-center gap-1">
-              <span class="material-symbols-outlined" style="font-size: 18px;">sort</span>
-              Urutkan:
-            </span>
-            <select class="form-select" id="sortEvents" style="width: 180px; height: 36px; padding: 0 12px;">
-              <option value="newest" ${currentSort === 'newest' ? 'selected' : ''}>Terbaru dibuat</option>
-              <option value="oldest" ${currentSort === 'oldest' ? 'selected' : ''}>Terlama dibuat</option>
+            <button class="bg-primary text-white text-[13px] font-semibold px-4 py-2 rounded-lg flex items-center gap-2 border-0 cursor-default">
+              <span class="material-symbols-outlined text-[18px]">filter_list</span>
+              Filters Status:
+            </button>
+            <div class="flex gap-2">
+              <button class="px-4 py-2 rounded-lg text-[13px] font-semibold cursor-pointer border transition-colors ${currentFilter === 'all' ? 'bg-teal-accent border-teal-accent text-white font-bold' : 'bg-surface-container-low border-border-subtle text-on-surface hover:bg-surface-container-high'}" data-filter="all">Semua</button>
+              <button class="px-4 py-2 rounded-lg text-[13px] font-semibold cursor-pointer border transition-colors ${currentFilter === 'active' ? 'bg-teal-accent border-teal-accent text-white font-bold' : 'bg-surface-container-low border-border-subtle text-on-surface hover:bg-surface-container-high'}" data-filter="active">Aktif</button>
+              <button class="px-4 py-2 rounded-lg text-[13px] font-semibold cursor-pointer border transition-colors ${currentFilter === 'draft' ? 'bg-teal-accent border-teal-accent text-white font-bold' : 'bg-surface-container-low border-border-subtle text-on-surface hover:bg-surface-container-high'}" data-filter="draft">Draft</button>
+            </div>
+          </div>
+          <div class="flex items-center gap-2 text-[13px] font-semibold text-on-surface-variant">
+            <span>Sort by:</span>
+            <select class="bg-transparent border-0 font-bold py-0 pr-8 text-primary cursor-pointer focus:ring-0" id="sortEvents" style="outline: none;">
+              <option value="newest" ${currentSort === 'newest' ? 'selected' : ''}>Terbaru Dibuat</option>
+              <option value="oldest" ${currentSort === 'oldest' ? 'selected' : ''}>Terlama Dibuat</option>
               <option value="dateAsc" ${currentSort === 'dateAsc' ? 'selected' : ''}>Tanggal Terdekat</option>
             </select>
           </div>
         </div>
 
-        <!-- Event Cards Grid -->
+        <!-- Event Cards Bento Grid -->
         ${events.length === 0 ? `
-          <div class="empty-state">
-            <span class="material-symbols-outlined">event_busy</span>
+          <div class="empty-state card" style="padding: var(--space-12);">
+            <span class="material-symbols-outlined" style="font-size: 48px; color: var(--outline);">event_busy</span>
             <h3>Tidak Ada Event Ditemukan</h3>
-            <p>Silakan buat event baru untuk memulai.</p>
+            <p>Silakan buat event baru untuk memulai pengisian.</p>
           </div>
         ` : `
-          <div class="grid grid-cols-3 gap-6" id="eventsGrid">
+          <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-8" id="eventsGrid">
             ${events.slice(0, displayCount).map((event, idx) => renderEventCard(event, idx)).join('')}
           </div>
 
           ${events.length > displayCount ? `
-            <div class="flex flex-col items-center mt-8">
-              <span class="text-sm text-outline mb-3">Menampilkan ${Math.min(displayCount, events.length)} dari ${events.length} event</span>
-              <button class="btn btn-secondary" id="btnLoadMore">Muat Lebih Banyak</button>
+            <div class="mt-12 flex flex-col items-center gap-4">
+              <button class="px-8 py-3 border-2 border-primary text-primary font-bold rounded-xl hover:bg-primary hover:text-white transition-all active:scale-95 cursor-pointer bg-transparent" id="btnLoadMore">
+                Load More Events
+              </button>
+              <p class="text-on-surface-variant text-[12px] font-medium">Menampilkan ${Math.min(displayCount, events.length)} dari ${events.length} event terdaftar</p>
             </div>
           ` : ''}
         `}
@@ -125,96 +138,103 @@ const EventsPage = (() => {
   // ============ Render Single Event Card ============
   function renderEventCard(event, idx) {
     const statusBadges = {
-      active: '<span class="chip chip-success">AKTIF</span>',
-      draft: '<span class="chip chip-warning">DRAFT</span>',
-      full: '<span class="chip chip-danger">PENUH</span>'
+      active: '<span class="bg-success-green/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight">Active</span>',
+      draft: '<span class="bg-primary/95 backdrop-blur-md text-white px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight">Draft</span>',
+      full: '<span class="bg-destructive-red/90 backdrop-blur-md text-white px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-tight">Full</span>'
     };
 
-    // Cyclic vibrant gradient colors for cards
-    const gradients = [
-      'linear-gradient(135deg, #4f46e5, #06b6d4)',
-      'linear-gradient(135deg, #ec4899, #8b5cf6)',
-      'linear-gradient(135deg, #f59e0b, #e11d48)',
-      'linear-gradient(135deg, #10b981, #059669)'
+    // Cyclic vibrant gradient cover images (simulating professional summits)
+    const covers = [
+      'https://lh3.googleusercontent.com/aida/AP1WRLsOMq_Wi_-xWShXDqbahGXkGuUb7Bzsza_CftXHUGaLtuvXgvLYZlt1Do6QasHdWwASTi1pZWmgjttuPe-iELXbO6lrSFld3pVmGbAcgrEuiKwch1sp9He-s5As3O2NSJVb8EFZjAMaC5CM2cPHD0b3ElftPNxCjfChbCaezWUs8vhrF952pFykcx0naHyO2HSfboV-DPq3Uk_wL0-ZYQ__xkr5e9mJkxIPeWI2OeBtE5VQAYQclxMF_nI',
+      'https://lh3.googleusercontent.com/aida/AP1WRLvrxEyfzQTGuAiTCAkEBIL93P_ijDfmUQbSucvyQkbG0IyCQTNx71Fs8RBDNSk3ppwI8zP7DFDvTDPx-tvytb84kaasOMjEDosfPTl3TYz4lWXSB8VsAa32rxXbKuFSO9qDhudcvIYC1CRSjrPtZND5AfEdFuM7lHR2CNO7Vc-snJFyZadX4ji11BkeyQQVEMzyL-LSOnATSz0-RpzF8qE6erbxVZm2ADKVJee0oWrjSffUzmTf4WEn8tE',
+      'https://lh3.googleusercontent.com/aida/AP1WRLsYNkkTtO_sZe2jGu2ls_l0jY4xaeEfQeEUGbyglsA4DeCgGahzTX4V3MkTBBD-NcrV5vVPtd1iO-LckFQ7z_rXLyySI238wxTukr-azqQITHZAlfE0L5hyIS05IZrdCuszf-Tscts13h8bGjQnp0UCkI-TNkVBF_etJ7SIFEBJ7EB9qbLTVS3V2po31xcJHNuPBP6-usbFTuw124yyHfrgpLmfuWvfHdrwbQmzOndLiGjaYVI23Rk_mG8'
     ];
-    const gradient = gradients[idx % gradients.length];
+    const coverUrl = event.coverImage || covers[idx % covers.length];
 
     const formattedDate = App.formatDate(event.date);
+    const categoryLabel = event.category === 'Webinar' ? 'WEBINAR' : 'SEMINAR';
+    const categoryColorClass = event.category === 'Webinar' ? 'text-teal-accent' : 'text-primary';
 
     return `
-      <div class="card animate-slide-up" style="animation-delay: ${idx * 0.05}s;">
-        <!-- Card Header Image/Gradient -->
-        <div style="height: 140px; background: ${gradient}; position: relative; display: flex; align-items: flex-end; padding: var(--space-4);">
-          <div style="position: absolute; top: var(--space-4); left: var(--space-4);">
+      <article class="group bg-surface-container-lowest border border-border-subtle rounded-xl overflow-hidden hover:border-teal-accent transition-all hover:shadow-xl hover:-translate-y-1 animate-scale-in" style="animation-delay: ${idx * 0.05}s;">
+        <!-- Card Cover Banner -->
+        <div class="aspect-video relative overflow-hidden" style="height: 180px;">
+          <img alt="${escapeHtml(event.title)}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="${coverUrl}" />
+          <div class="absolute top-4 left-4">
             ${statusBadges[event.status] || statusBadges.draft}
           </div>
-          <div style="position: absolute; top: var(--space-4); right: var(--space-4); background: rgba(0, 0, 0, 0.4); color: white; padding: 4px 10px; border-radius: var(--radius-full); font-size: 11px; font-weight: 600; backdrop-filter: blur(4px);">
-            ${event.participantCount || 0} Peserta
+          <div class="absolute bottom-4 right-4">
+            <span class="bg-white/90 backdrop-blur-md text-primary font-bold px-3 py-1 rounded-lg text-[12px] shadow-sm flex items-center gap-1">
+              <span class="material-symbols-outlined text-[16px]">groups</span>
+              ${event.participantCount || 0} Registered
+            </span>
           </div>
-          <div style="color: white; font-size: 12px; font-weight: 500; display: flex; align-items: center; gap: 4px; background: rgba(0,0,0,0.2); padding: 2px 6px; border-radius: 4px;">
-            <span class="material-symbols-outlined" style="font-size: 14px;">key</span>
-            Kode: ${event.joinCode}
+          <div class="absolute bottom-4 left-4 bg-black/40 text-white font-bold px-2 py-0.5 rounded text-[11px] backdrop-filter blur-[2px] flex items-center gap-1">
+            <span class="material-symbols-outlined text-[13px]">key</span>
+            Code: ${event.joinCode}
           </div>
         </div>
 
         <!-- Card Body -->
-        <div class="card-body" style="padding: var(--space-5);">
-          <div class="flex items-center gap-2 mb-2" style="font-size: 12px; color: var(--outline); font-weight: 500;">
-            <span class="material-symbols-outlined text-teal" style="font-size: 16px;">calendar_month</span>
-            ${formattedDate}
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-2">
+            <div class="flex items-center gap-1.5 text-[12px] font-semibold text-outline">
+              <span class="material-symbols-outlined text-[16px]">calendar_today</span>
+              <span>${formattedDate}</span>
+            </div>
+            <span class="text-[11px] font-extrabold uppercase tracking-widest px-2 py-0.5 rounded bg-surface-container-low ${categoryColorClass}">
+              ${categoryLabel}
+            </span>
           </div>
-          <h4 style="font-family: var(--font-heading); font-size: 16px; font-weight: 600; line-height: 1.4; margin-bottom: var(--space-2); min-height: 44px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;" title="${escapeHtml(event.title)}">
-            ${escapeHtml(event.title)}
-          </h4>
-          <p class="flex items-start gap-1" style="font-size: 13px; color: var(--on-surface-variant); min-height: 36px; line-height: 1.4;">
-            <span class="material-symbols-outlined text-teal" style="font-size: 16px; margin-top: 1px;">location_on</span>
-            <span style="display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">${escapeHtml(event.location || 'Online')}</span>
-          </p>
-        </div>
 
-        <!-- Card Footer Actions -->
-        <div style="padding: 0 var(--space-5) var(--space-5); display: flex; gap: var(--space-2); flex-wrap: wrap;">
-          <button class="btn btn-ghost btn-sm flex-1 btn-edit-event" data-id="${event.id}" title="Edit Detail">
-            <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
-            Ubah
-          </button>
-          <button class="btn btn-ghost btn-sm flex-1 btn-view-participants" data-id="${event.id}" title="Lihat Peserta">
-            <span class="material-symbols-outlined" style="font-size: 16px;">group</span>
-            Peserta
-          </button>
-          <button class="btn btn-secondary btn-sm flex-1 btn-builder" data-id="${event.id}" title="Form Builder">
-            <span class="material-symbols-outlined" style="font-size: 16px;">dynamic_form</span>
-            Form
-          </button>
-        </div>
-        <div style="border-top: 1px solid var(--border-subtle); padding: 8px var(--space-5); background: var(--surface-container-low); display: flex; justify-content: space-between; align-items: center;">
-          <a href="#register?event=${event.id}" class="text-sm font-semibold flex items-center gap-1 text-primary" target="_blank" style="text-decoration: none;">
-            <span class="material-symbols-outlined" style="font-size: 16px;">link</span>
-            Link Registrasi
-          </a>
-          <div style="display: flex; gap: 8px; align-items: center;">
-            <button class="btn-broadcast-event topbar-icon-btn" data-id="${event.id}" data-title="${escapeHtml(event.title)}" title="Kirim Broadcast ke Grup Chat" style="padding: 2px; color: var(--primary);">
-              <span class="material-symbols-outlined" style="font-size: 20px;">campaign</span>
-            </button>
-            <button class="btn-q-builder topbar-icon-btn" data-id="${event.id}" title="Builder Kuesioner" style="padding: 2px; color: var(--teal-accent);">
-              <span class="material-symbols-outlined" style="font-size: 20px;">settings_suggest</span>
-            </button>
-            <button class="btn-q-results topbar-icon-btn" data-id="${event.id}" title="Hasil Evaluasi Kuesioner" style="padding: 2px; color: var(--primary);">
-              <span class="material-symbols-outlined" style="font-size: 20px;">insights</span>
-            </button>
-            <button class="btn-delete-event topbar-icon-btn" data-id="${event.id}" data-title="${escapeHtml(event.title)}" title="Hapus Event" style="padding: 2px; color: var(--destructive-red);">
-              <span class="material-symbols-outlined" style="font-size: 20px;">delete</span>
-            </button>
+          <h3 class="font-bold font-heading text-lg text-on-surface mb-2 group-hover:text-primary transition-colors line-clamp-2 h-[56px] leading-tight" title="${escapeHtml(event.title)}">
+            ${escapeHtml(event.title)}
+          </h3>
+
+          <div class="flex items-center gap-1 text-[13px] text-on-surface-variant mb-6 line-clamp-1">
+            <span class="material-symbols-outlined text-[16px] text-teal-accent">location_on</span>
+            <span>${escapeHtml(event.location || 'Online')}</span>
+          </div>
+
+          <!-- Card Actions (Premium Layout) -->
+          <div class="flex items-center justify-between pt-4 border-t border-border-subtle">
+            <div class="flex gap-1.5">
+              <button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded-lg text-outline bg-transparent hover:bg-primary hover:text-white hover:border-primary transition-all cursor-pointer btn-edit-event" data-id="${event.id}" title="Ubah Detail Event">
+                <span class="material-symbols-outlined text-[18px]">edit</span>
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded-lg text-outline bg-transparent hover:bg-secondary hover:text-white hover:border-secondary transition-all cursor-pointer btn-view-participants" data-id="${event.id}" title="Data Peserta & Spreadsheet">
+                <span class="material-symbols-outlined text-[18px]">diversity_3</span>
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded-lg text-outline bg-transparent hover:bg-teal-accent hover:text-white hover:border-teal-accent transition-all cursor-pointer btn-builder" data-id="${event.id}" title="Desain Form Registrasi">
+                <span class="material-symbols-outlined text-[18px]">dynamic_form</span>
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded-lg text-outline bg-transparent hover:bg-amber-500 hover:text-white hover:border-amber-500 transition-all cursor-pointer btn-broadcast-event" data-id="${event.id}" data-title="${escapeHtml(event.title)}" title="Kirim Broadcast Announcement">
+                <span class="material-symbols-outlined text-[18px]">campaign</span>
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded-lg text-outline bg-transparent hover:bg-indigo-500 hover:text-white hover:border-indigo-500 transition-all cursor-pointer btn-q-builder" data-id="${event.id}" title="Ubah Kuesioner Evaluasi">
+                <span class="material-symbols-outlined text-[18px]">settings_suggest</span>
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded-lg text-outline bg-transparent hover:bg-purple-600 hover:text-white hover:border-purple-600 transition-all cursor-pointer btn-q-results" data-id="${event.id}" title="Visualisasi Hasil Feedback">
+                <span class="material-symbols-outlined text-[18px]">insights</span>
+              </button>
+              <button class="w-8 h-8 flex items-center justify-center border border-border-subtle rounded-lg text-outline bg-transparent hover:bg-destructive-red hover:text-white hover:border-destructive-red transition-all cursor-pointer btn-delete-event" data-id="${event.id}" data-title="${escapeHtml(event.title)}" title="Hapus Event secara Permanen">
+                <span class="material-symbols-outlined text-[18px]">delete</span>
+              </button>
+            </div>
+            
+            <a href="#register?event=${event.id}" target="_blank" class="text-primary font-bold text-[12px] flex items-center gap-0.5 hover:underline" style="text-decoration: none;">
+              Register <span class="material-symbols-outlined text-[16px]">arrow_forward</span>
+            </a>
           </div>
         </div>
-      </div>
+      </article>
     `;
   }
 
   // ============ Event Bindings ============
   function bindEvents() {
     // Filter chips
-    document.querySelectorAll('.filter-bar button.chip').forEach(btn => {
+    document.querySelectorAll('button[data-filter]').forEach(btn => {
       btn.addEventListener('click', () => {
         currentFilter = btn.dataset.filter;
         render();

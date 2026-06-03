@@ -50,6 +50,43 @@
   <script src="https://cdn.jsdelivr.net/npm/qrcodejs@1.0.0/qrcode.min.js"></script>
   <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
 
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      corePlugins: {
+        preflight: false,
+      },
+      theme: {
+        extend: {
+          colors: {
+            "border-subtle": "#E2E8F0",
+            "success-green": "#10B981",
+            "outline": "#757682",
+            "outline-variant": "#c5c5d3",
+            "destructive-red": "#EF4444",
+            "admin-blue-dark": "#172554",
+            "primary": "#00236f",
+            "on-surface": "#0b1c30",
+            "on-surface-variant": "#444651",
+            "secondary": "#006a61",
+            "surface-container-lowest": "#ffffff",
+            "secondary-container": "#86f2e4",
+            "surface-container-high": "#dce9ff",
+            "surface-container-low": "#eff4ff",
+            "surface-bg": "#F8FAFC",
+            "surface": "#f8f9ff",
+            "surface-variant": "#d3e4fe",
+            "on-background": "#0b1c30",
+            "primary-container": "#1e3a8a",
+            "on-primary": "#ffffff",
+            "teal-accent": "#14B8A6"
+          }
+        }
+      }
+    };
+  </script>
+
   <!-- App Styles -->
   <link rel="stylesheet" href="styles.css">
 </head>
